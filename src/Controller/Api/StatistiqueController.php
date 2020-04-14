@@ -105,23 +105,29 @@ class StatistiqueController extends ApiController
         $list = $this->operationRepository->getEtatPaiementFacturesModePaiement($dateDebut, $dateFin);
 
         $paymentMethods = [];
-        $groupedResults = [];
 
         foreach ($cptMoyenPaiementRepository->findAll() as $method) {
             $paymentMethods[$method->getCode()] = $method->getLibelle();
         }
 
-        foreach ($list as $operation) {
-            $key = $operation['moyenPaiement']['code'];
+        $grouped = [];
 
-            if (array_key_exists($key, $groupedResults)) {
-                $groupedResults[$paymentMethods[$key]] += $operation['montant'];
+        foreach ($list as $operation) {
+            $month = $operation['dateOperation']->format('Y-m');
+            $key = $paymentMethods[$operation['moyenPaiement']['code']];
+
+            if (array_key_exists($month, $grouped)) {
+                if (array_key_exists($key, $grouped[$month])) {
+                    $grouped[$month][$key] += $operation['montant'];
+                } else {
+                    $grouped[$month][$key] = $operation['montant'];
+                }
             } else {
-                $groupedResults[$paymentMethods[$key]] = $operation['montant'];
+                $grouped[$month][$key] = $operation['montant'];
             }
         }
 
-        return $this->json($groupedResults);
+        return $this->json($grouped);
     }
 
     /**
