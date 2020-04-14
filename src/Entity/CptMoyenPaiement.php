@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CptMoyenPaiement
+ * CptMoyenPaiement.
  *
  * @ORM\Table(name="cpt_moyen_paiement", indexes={@ORM\Index(name="IDX_E35BA228896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_E35BA228B03A8386", columns={"created_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CptMoyenPaiementRepository")
  */
 class CptMoyenPaiement
 {
@@ -196,6 +200,4 @@ class CptMoyenPaiement
 
         return $this;
     }
-
-
 }

@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CmlStatusFacture
+ * CmlStatusFacture.
  *
  * @ORM\Table(name="cml_status_facture", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_68923DD1A4D60759", columns={"libelle"})}, indexes={@ORM\Index(name="IDX_68923DD1B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_68923DD1896DBBDE", columns={"updated_by_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CmlStatusFactureRepository")
  */
 class CmlStatusFacture extends BaseEntity
 {
@@ -44,5 +48,4 @@ class CmlStatusFacture extends BaseEntity
 
         return $this;
     }
-
 }

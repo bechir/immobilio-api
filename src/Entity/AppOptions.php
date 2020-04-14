@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * AppOptions
+ * AppOptions.
  *
  * @ORM\Table(name="app_options", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_3D687ACAB62DD4E5", columns={"option_name"})}, indexes={@ORM\Index(name="IDX_3D687ACAB03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_3D687ACA896DBBDE", columns={"updated_by_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\AppOptionsRepository")
  */
 class AppOptions extends BaseEntity
 {
@@ -63,6 +67,4 @@ class AppOptions extends BaseEntity
 
         return $this;
     }
-
-
 }

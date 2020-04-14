@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Repository;
 
 use App\Entity\BaseEntity;

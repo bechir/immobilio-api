@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * PatPosition
+ * PatPosition.
  *
  * @ORM\Table(name="pat_position", indexes={@ORM\Index(name="IDX_BF829EBA896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_BF829EBA5992120A", columns={"bien_immobilier_id"}), @ORM\Index(name="IDX_BF829EBAB03A8386", columns={"created_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\PatPositionRepository")
  */
 class PatPosition extends BaseEntity
 {
@@ -64,5 +68,4 @@ class PatPosition extends BaseEntity
 
         return $this;
     }
-
 }

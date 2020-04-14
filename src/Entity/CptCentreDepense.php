@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CptCentreDepense
+ * CptCentreDepense.
  *
  * @ORM\Table(name="cpt_centre_depense", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_727BA9E8A4D60759", columns={"libelle"})}, indexes={@ORM\Index(name="IDX_727BA9E8B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_727BA9E8896DBBDE", columns={"updated_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CptCentreDepenseRepository")
  */
 class CptCentreDepense extends BaseEntity
 {
@@ -44,5 +48,4 @@ class CptCentreDepense extends BaseEntity
 
         return $this;
     }
-
 }

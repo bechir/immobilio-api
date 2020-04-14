@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CptOperationCaisse
+ * CptOperationCaisse.
  *
  * @ORM\Table(name="cpt_operation_caisse", indexes={@ORM\Index(name="IDX_9A7BAA815332C612", columns={"coentre_depense_code"}), @ORM\Index(name="IDX_9A7BAA8132ECC4F2", columns={"type_operation_caisse_id"}), @ORM\Index(name="IDX_9A7BAA8119EB6921", columns={"client_id"}), @ORM\Index(name="IDX_9A7BAA818E122D7C", columns={"status_operation_id"}), @ORM\Index(name="IDX_9A7BAA81B2C090B7", columns={"operation_annule_id"}), @ORM\Index(name="IDX_9A7BAA813DC877FA", columns={"sci_id"}), @ORM\Index(name="IDX_9A7BAA81896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_9A7BAA81F2C56620", columns={"compte_id"}), @ORM\Index(name="IDX_9A7BAA814BCFA944", columns={"sous_centre_depense_code"}), @ORM\Index(name="IDX_9A7BAA81D725330D", columns={"agence_id"}), @ORM\Index(name="IDX_9A7BAA8195D9453A", columns={"journal_caisse_id"}), @ORM\Index(name="IDX_9A7BAA813BCB2E4B", columns={"nature_id"}), @ORM\Index(name="IDX_9A7BAA81B6885C6C", columns={"espace_id"}), @ORM\Index(name="IDX_9A7BAA81B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_9A7BAA815992120A", columns={"bien_immobilier_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CptOperationCaisseRepository")
  */
 class CptOperationCaisse
 {
@@ -709,6 +713,4 @@ class CptOperationCaisse
 
         return $this;
     }
-
-
 }

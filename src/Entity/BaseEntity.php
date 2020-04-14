@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -51,7 +55,6 @@ class BaseEntity
      * @ORM\Column(name="deleted", type="boolean", nullable=true, options={"default"="0","comment"="Indique si l'élément est supprimé"})
      */
     private $deleted = false;
-
 
     public function getCreatedAt(): ?\DateTimeInterface
     {

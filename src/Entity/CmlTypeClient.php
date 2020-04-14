@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CmlTypeClient
+ * CmlTypeClient.
  *
  * @ORM\Table(name="cml_type_client", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_EA05AB56A4D60759", columns={"libelle"}), @ORM\UniqueConstraint(name="UNIQ_EA05AB5677153098", columns={"code"})}, indexes={@ORM\Index(name="IDX_EA05AB56896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_EA05AB56B03A8386", columns={"created_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CmlTypeClientRepository")
  */
 class CmlTypeClient extends BaseEntity
 {
@@ -63,5 +67,4 @@ class CmlTypeClient extends BaseEntity
 
         return $this;
     }
-
 }

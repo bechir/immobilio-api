@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CptTypeCompte
+ * CptTypeCompte.
  *
  * @ORM\Table(name="cpt_type_compte", indexes={@ORM\Index(name="IDX_DDFBC4E3896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_DDFBC4E3B03A8386", columns={"created_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CptTypeCompteRepository")
  */
 class CptTypeCompte extends BaseEntity
 {
@@ -82,5 +86,4 @@ class CptTypeCompte extends BaseEntity
 
         return $this;
     }
-
 }

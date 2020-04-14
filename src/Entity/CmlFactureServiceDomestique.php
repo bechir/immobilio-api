@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CmlFactureServiceDomestique
+ * CmlFactureServiceDomestique.
  *
  * @ORM\Table(name="cml_facture_service_domestique", indexes={@ORM\Index(name="IDX_34CE5E621CD4A87E", columns={"service_domestique_code"}), @ORM\Index(name="IDX_34CE5E62896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_34CE5E62B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_34CE5E627F2DEE08", columns={"facture_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CmlFactureServiceDomestiqueRepository")
  */
 class CmlFactureServiceDomestique extends BaseEntity
 {
@@ -107,5 +111,4 @@ class CmlFactureServiceDomestique extends BaseEntity
 
         return $this;
     }
-
 }

@@ -1,14 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 
 /**
- * CmlFactureEspace
+ * CmlFactureEspace.
  *
  * @ORM\Table(name="cml_facture_espace", indexes={@ORM\Index(name="IDX_CDF8358E896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_CDF8358EB6885C6C", columns={"espace_id"}), @ORM\Index(name="IDX_CDF8358EB03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_CDF8358E7F2DEE08", columns={"facture_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CmlFactureEspaceRepository")
+ *
+ * @ExclusionPolicy("all")
  */
 class CmlFactureEspace extends BaseEntity
 {
@@ -18,6 +26,7 @@ class CmlFactureEspace extends BaseEntity
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Expose
      */
     private $id;
 
@@ -25,6 +34,7 @@ class CmlFactureEspace extends BaseEntity
      * @var int
      *
      * @ORM\Column(name="loyer_mensuel", type="integer", nullable=false)
+     * @Expose
      */
     private $loyerMensuel;
 
@@ -32,6 +42,7 @@ class CmlFactureEspace extends BaseEntity
      * @var int
      *
      * @ORM\Column(name="caution", type="integer", nullable=false)
+     * @Expose
      */
     private $caution;
 
@@ -39,6 +50,7 @@ class CmlFactureEspace extends BaseEntity
      * @var int
      *
      * @ORM\Column(name="nombre_mois", type="integer", nullable=false)
+     * @Expose
      */
     private $nombreMois;
 
@@ -46,6 +58,7 @@ class CmlFactureEspace extends BaseEntity
      * @var string|null
      *
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
+     * @Expose
      */
     private $description;
 
@@ -145,6 +158,4 @@ class CmlFactureEspace extends BaseEntity
 
         return $this;
     }
-
-
 }

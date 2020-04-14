@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CmlContrat
+ * CmlContrat.
  *
  * @ORM\Table(name="cml_contrat", indexes={@ORM\Index(name="IDX_4DA11B22896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_4DA11B22B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_4DA11B2219EB6921", columns={"client_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CmlContratRepository")
  */
 class CmlContrat extends BaseEntity
 {

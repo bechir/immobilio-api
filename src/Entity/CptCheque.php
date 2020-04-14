@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CptCheque
+ * CptCheque.
  *
  * @ORM\Table(name="cpt_cheque", indexes={@ORM\Index(name="IDX_C5074EAE37E080D9", columns={"banque_id"}), @ORM\Index(name="IDX_C5074EAE182EF3BE", columns={"status_cheque_code"}), @ORM\Index(name="IDX_C5074EAE896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_C5074EAE19EB6921", columns={"client_id"}), @ORM\Index(name="IDX_C5074EAED725330D", columns={"agence_id"}), @ORM\Index(name="IDX_C5074EAEB03A8386", columns={"created_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CptChequeRepository")
  */
 class CptCheque extends BaseEntity
 {
@@ -219,5 +223,4 @@ class CptCheque extends BaseEntity
 
         return $this;
     }
-
 }

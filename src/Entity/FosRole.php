@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * FosRole
+ * FosRole.
  *
  * @ORM\Table(name="fos_role")
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\FosRoleRepository")
  */
 class FosRole
 {
@@ -63,6 +67,4 @@ class FosRole
 
         return $this;
     }
-
-
 }

@@ -1,16 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
- * CmlClient
+ * CmlClient.
  *
  * @ORM\Table(name="cml_client", indexes={@ORM\Index(name="IDX_502938AA896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_502938AAB03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_502938AAAD2D2831", columns={"type_client_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CmlClientRepository")
  */
-class CmlClient extends BaseEntity
+class CmlClient extends BaseEntity implements JsonSerializable
 {
     /**
      * @var int
@@ -597,5 +602,17 @@ class CmlClient extends BaseEntity
         $this->typeClient = $typeClient;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'type' => $this->typeClient ? $this->typeClient->getLibelle() : '',
+            'email' => $this->emailClient,
+            'nom' => $this->nom,
+            'prenom' => $this->prenom,
+            'codeAgence' => $this->codeAgence,
+        ];
     }
 }

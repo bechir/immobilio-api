@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * AppVille
+ * AppVille.
  *
  * @ORM\Table(name="app_ville", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_9510540E6C6E55B5", columns={"nom"}), @ORM\UniqueConstraint(name="UNIQ_9510540E77153098", columns={"code"})}, indexes={@ORM\Index(name="IDX_9510540E98260155", columns={"region_id"}), @ORM\Index(name="IDX_9510540E896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_9510540EA6E44244", columns={"pays_id"}), @ORM\Index(name="IDX_9510540EB03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_9510540E9500069D", columns={"ville_parent_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\AppVilleRepository")
  */
 class AppVille extends BaseEntity
 {

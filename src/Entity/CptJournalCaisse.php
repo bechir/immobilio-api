@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CptJournalCaisse
+ * CptJournalCaisse.
  *
  * @ORM\Table(name="cpt_journal_caisse", indexes={@ORM\Index(name="IDX_67E4F4D7B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_67E4F4D7F2C56620", columns={"compte_id"}), @ORM\Index(name="IDX_67E4F4D7896DBBDE", columns={"updated_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CptJournalCaisseRepository")
  */
 class CptJournalCaisse
 {
@@ -196,6 +200,4 @@ class CptJournalCaisse
 
         return $this;
     }
-
-
 }

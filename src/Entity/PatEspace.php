@@ -1,14 +1,24 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation\VirtualProperty;
 
 /**
- * PatEspace
+ * PatEspace.
  *
  * @ORM\Table(name="pat_espace", indexes={@ORM\Index(name="IDX_1435D6F3896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_1435D6F35992120A", columns={"bien_immobilier_id"}), @ORM\Index(name="IDX_1435D6F3DD842E46", columns={"position_id"}), @ORM\Index(name="IDX_1435D6F3B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_1435D6F376C50E4A", columns={"proprietaire_id"}), @ORM\Index(name="IDX_1435D6F3ABC9EDAD", columns={"nature_espace_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\PatEspaceRepository")
+ *
+ * @ExclusionPolicy("all")
  */
 class PatEspace extends BaseEntity
 {
@@ -18,6 +28,8 @@ class PatEspace extends BaseEntity
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
+     * @Expose
      */
     private $id;
 
@@ -26,6 +38,8 @@ class PatEspace extends BaseEntity
      *
      * @ORM\ManyToOne(targetEntity="PatBienImmobilier")
      * @ORM\JoinColumn(name="bien_immobilier_id", referencedColumnName="id", nullable=true)
+     *
+     * @Expose
      */
     private $bienImmobilier;
 
@@ -33,6 +47,8 @@ class PatEspace extends BaseEntity
      * @var string|null
      *
      * @ORM\Column(name="reference", type="string", length=15, nullable=true)
+     *
+     * @Expose
      */
     private $reference;
 
@@ -40,6 +56,8 @@ class PatEspace extends BaseEntity
      * @var string|null
      *
      * @ORM\Column(name="adresse", type="string", length=255, nullable=true)
+     *
+     * @Expose
      */
     private $adresse;
 
@@ -47,6 +65,8 @@ class PatEspace extends BaseEntity
      * @var string
      *
      * @ORM\Column(name="libelle", type="string", length=255, nullable=false)
+     *
+     * @Expose
      */
     private $libelle;
 
@@ -54,6 +74,8 @@ class PatEspace extends BaseEntity
      * @var string|null
      *
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
+     *
+     * @Expose
      */
     private $description;
 
@@ -61,6 +83,8 @@ class PatEspace extends BaseEntity
      * @var int|null
      *
      * @ORM\Column(name="superfice", type="integer", nullable=true)
+     *
+     * @Expose
      */
     private $superfice;
 
@@ -84,6 +108,8 @@ class PatEspace extends BaseEntity
      * @var float|null
      *
      * @ORM\Column(name="prix", type="float", precision=10, scale=0, nullable=true)
+     *
+     * @Expose
      */
     private $prix;
 
@@ -92,6 +118,8 @@ class PatEspace extends BaseEntity
      *
      * @ORM\ManyToOne(targetEntity="PatPosition")
      * @ORM\JoinColumn(name="position_id", referencedColumnName="id", nullable=true)
+     *
+     * @Expose
      */
     private $position;
 
@@ -99,6 +127,8 @@ class PatEspace extends BaseEntity
      * @var int|null
      *
      * @ORM\Column(name="num_position", type="integer", nullable=true)
+     *
+     * @Expose
      */
     private $numPosition;
 
@@ -106,6 +136,8 @@ class PatEspace extends BaseEntity
      * @var string
      *
      * @ORM\Column(name="code_agence", type="string", length=10, nullable=false, options={"default"="DLA01"})
+     *
+     * @Expose
      */
     private $codeAgence = 'DLA01';
 
@@ -258,5 +290,12 @@ class PatEspace extends BaseEntity
         return $this;
     }
 
-
+    /**
+     * @VirtualProperty
+     * @SerializedName("nature")
+     */
+    public function apiNatureEspaceExpose()
+    {
+        return $this->natureEspace ? $this->natureEspace->getLibelle() : '';
+    }
 }

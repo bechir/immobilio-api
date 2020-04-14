@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CmlContratEspace
+ * CmlContratEspace.
  *
  * @ORM\Table(name="cml_contrat_espace", indexes={@ORM\Index(name="IDX_EA9202C5896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_EA9202C5B6885C6C", columns={"espace_id"}), @ORM\Index(name="IDX_EA9202C5B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_EA9202C51823061F", columns={"contrat_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CmlContratEspaceRepository")
  */
 class CmlContratEspace extends BaseEntity
 {
@@ -145,5 +149,4 @@ class CmlContratEspace extends BaseEntity
 
         return $this;
     }
-
 }

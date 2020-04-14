@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * PatBienImmobilier
+ * PatBienImmobilier.
  *
  * @ORM\Table(name="pat_bien_immobilier", indexes={@ORM\Index(name="IDX_FD3D670C896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_FD3D670C3DC877FA", columns={"sci_id"}), @ORM\Index(name="IDX_FD3D670CA73F0036", columns={"ville_id"}), @ORM\Index(name="IDX_FD3D670CB03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_FD3D670C76C50E4A", columns={"proprietaire_id"}), @ORM\Index(name="IDX_FD3D670CABC9EDAD", columns={"nature_espace_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\PatBienImmobilierRepository")
  */
 class PatBienImmobilier extends BaseEntity
 {

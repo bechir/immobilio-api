@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * AppAgence
+ * AppAgence.
  *
  * @ORM\Table(name="app_agence", uniqueConstraints={@ORM\UniqueConstraint(name="code_UNIQUE", columns={"code"}), @ORM\UniqueConstraint(name="UNIQ_81C2F7296C6E55B5", columns={"nom"})}, indexes={@ORM\Index(name="IDX_81C2F729B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_81C2F729A73F0036", columns={"ville_id"}), @ORM\Index(name="IDX_81C2F729896DBBDE", columns={"updated_by_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\AppAgenceRepository")
  */
 class AppAgence extends BaseEntity
 {

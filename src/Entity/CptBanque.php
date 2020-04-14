@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CptBanque
+ * CptBanque.
  *
  * @ORM\Table(name="cpt_banque", indexes={@ORM\Index(name="IDX_D44A787B896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_D44A787BB03A8386", columns={"created_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CptBanqueRepository")
  */
 class CptBanque extends BaseEntity
 {

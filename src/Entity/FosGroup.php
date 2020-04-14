@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * FosGroup
+ * FosGroup.
  *
  * @ORM\Table(name="fos_group", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_4B019DDB5E237E06", columns={"name"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\FosGroupRepository")
  */
 class FosGroup
 {
@@ -101,6 +105,4 @@ class FosGroup
 
         return $this;
     }
-
-
 }

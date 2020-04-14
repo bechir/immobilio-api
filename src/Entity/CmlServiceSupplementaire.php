@@ -1,14 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Immobilio API application.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CmlServiceSupplementaire
+ * CmlServiceSupplementaire.
  *
  * @ORM\Table(name="cml_service_supplementaire", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_7AD4D508A4D60759", columns={"libelle"})}, indexes={@ORM\Index(name="IDX_7AD4D508B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_7AD4D508896DBBDE", columns={"updated_by_id"})})
- * @ORM\Entity
+ *@ORM\Entity(repositoryClass="App\Repository\CmlServiceSupplementaireRepository")
  */
 class CmlServiceSupplementaire extends BaseEntity
 {
