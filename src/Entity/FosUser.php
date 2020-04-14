@@ -7,6 +7,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * FosUser.
@@ -14,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="fos_user", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_957A6479A0D96FBF", columns={"email_canonical"}), @ORM\UniqueConstraint(name="UNIQ_957A647992FC23A8", columns={"username_canonical"}), @ORM\UniqueConstraint(name="UNIQ_957A6479C05FB297", columns={"confirmation_token"})}, indexes={@ORM\Index(name="IDX_957A6479A6E44244", columns={"pays_id"}), @ORM\Index(name="IDX_957A6479D725330D", columns={"agence_id"}), @ORM\Index(name="IDX_957A6479A73F0036", columns={"ville_id"})})
  *@ORM\Entity(repositoryClass="App\Repository\FosUserRepository")
  */
-class FosUser
+class FosUser implements UserInterface
 {
     /**
      * @var int
@@ -335,5 +336,14 @@ class FosUser
         $this->agence = $agence;
 
         return $this;
+    }
+
+    public function eraseCredentials()
+    {
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return in_array($role, $this->roles);
     }
 }

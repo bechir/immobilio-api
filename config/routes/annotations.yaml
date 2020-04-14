@@ -6,6 +6,8 @@ api:
     resource: ../../src/Controller/Api/
     type: annotation
     prefix: /api/
+    defaults:
+        _format: json
 
 kernel:
     resource: ../../src/Kernel.php

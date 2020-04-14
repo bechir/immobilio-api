@@ -25,8 +25,9 @@ class FacturationController extends ApiController
      *
      * @Route("/factures/client/{clientId}/{dateDebut}/{dateFin}", name="api_factures_by_client")
      */
-    public function getFacturesByClient(int $clientId, string $dateDebut, string $dateFin, CmlFactureRepository $factureRepository)
+    public function getFacturesByClient(string $clientId, string $dateDebut, string $dateFin, CmlFactureRepository $factureRepository)
     {
+        $this->denyAccessUnlessGranted('view', $this->getUser());
         $list = $factureRepository->getFacturesByClient($clientId, $dateDebut, $dateFin);
 
         return $this->jsonResponse($list, 'json', SerializationContext::create()->setGroups(['list']));
@@ -43,8 +44,9 @@ class FacturationController extends ApiController
      *
      * @Route("/factures/client/{clientId}/{statusCode}/{dateDebut}/{dateFin}", name="api_factures_by_client_status")
      */
-    public function getFacturesByClientStatus(int $clientId, string $statusCode, string $dateDebut, string $dateFin, CmlFactureRepository $factureRepository)
+    public function getFacturesByClientStatus(string $clientId, string $statusCode, string $dateDebut, string $dateFin, CmlFactureRepository $factureRepository)
     {
+        $this->denyAccessUnlessGranted('view', $this->getUser());
         $list = $factureRepository->getFacturesByClientStatus($clientId, $dateDebut, $dateFin, $statusCode);
 
         return $this->jsonResponse($list, 'json', SerializationContext::create()->setGroups(['list']));
@@ -63,6 +65,7 @@ class FacturationController extends ApiController
      */
     public function getPaiementsFactureByDatesAgenceSci(int $agenceId, $sciId, string $dateDebut, string $dateFin, CptOperationCaisseRepository $cptOpCaissseRepository)
     {
+        $this->denyAccessUnlessGranted('view', $this->getUser());
         $list = $cptOpCaissseRepository->getPaiementsFactureByDatesAgenceSci($agenceId, $sciId, $dateDebut, $dateFin);
 
         return $this->jsonResponse($list);
@@ -80,6 +83,7 @@ class FacturationController extends ApiController
      */
     public function getPaiementsFactureByClient(int $clientId, $dateDebut, string $dateFin, CptOperationCaisseRepository $cptOpCaissseRepository)
     {
+        $this->denyAccessUnlessGranted('view', $this->getUser());
         $list = $cptOpCaissseRepository->getPaiementsFactureByDatesClientSci($clientId, $dateDebut, $dateFin);
 
         return $this->jsonResponse($list);
@@ -94,6 +98,7 @@ class FacturationController extends ApiController
      */
     public function getFacture(CmlFacture $facture, CmlFactureEspaceRepository $factureEspaceRepository)
     {
+        $this->denyAccessUnlessGranted('view', $this->getUser());
         $cmlEspace = $factureEspaceRepository->findOneBy(['facture' => $facture]);
         $patEspace = $cmlEspace->getEspace();
 
@@ -116,6 +121,8 @@ class FacturationController extends ApiController
      */
     public function getPaiementsFacture(CptOperationCaisse $operation)
     {
+        $this->denyAccessUnlessGranted('view', $this->getUser());
+
         return $this->jsonResponse($operation);
     }
 }
