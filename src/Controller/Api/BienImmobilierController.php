@@ -7,8 +7,8 @@
 namespace App\Controller\Api;
 
 use App\Repository\PatBienImmobilierRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use DateTime;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 class BienImmobilierController extends ApiController
 {

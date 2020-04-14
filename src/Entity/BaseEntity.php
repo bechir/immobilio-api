@@ -35,27 +35,6 @@ class BaseEntity
      */
     private $updatedBy;
 
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="enabled", type="boolean", nullable=true, options={"default"="1","comment"="Indique si l'élément est actif ou non"})
-     */
-    private $enabled = true;
-
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="archived", type="boolean", nullable=true, options={"default"="0","comment"="Indique si l'élément est archivé"})
-     */
-    private $archived = false;
-
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="deleted", type="boolean", nullable=true, options={"default"="0","comment"="Indique si l'élément est supprimé"})
-     */
-    private $deleted = false;
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;

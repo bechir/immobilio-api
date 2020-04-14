@@ -37,7 +37,11 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     public function getEtatPaiementFacturesModePaiement($dateDebut, $dateFin)
     {
         return $this->buildPeriodQuery($dateDebut, $dateFin)
-            ->andWhere('o.typeOperationCaisseId = 6')
+            ->leftJoin('o.typeOperationCaisse', 'typeOperation')
+                ->addSelect('typeOperation')
+            ->leftJoin('o.moyenPaiement', 'm')
+                ->addSelect('m')
+            ->andWhere('typeOperation.id = 6')
             ->getQuery()->getResult(\PDO::FETCH_ASSOC);
     }
 
@@ -55,8 +59,12 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     {
         return $this->getAssocResults(
             $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->andWhere('o.natureId = :nature')
-                ->andWhere('o.typeOperationCaisseId = 8')
+                ->leftJoin('o.nature', 'n')
+                    ->addSelect('n')
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->andWhere('n.id = :nature')
+                ->andWhere('t.id = 8')
                 ->setParameter('nature', $natureId)
         );
     }
@@ -65,10 +73,18 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     {
         return $this->getAssocResults(
             $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->andWhere('o.agenceId = :agence')
-                ->orWhere('o.sciId = :sci')
-                ->andWhere('o.natureId = :nature')
-                ->andWhere('o.typeOperationCaisseId = 8')
+                ->leftJoin('o.agence', 'a')
+                    ->addSelect('a')
+                ->leftJoin('o.nature', 'n')
+                    ->addSelect('n')
+                ->leftJoin('o.sci', 's')
+                    ->addSelect('s')
+                ->leftJoin('o.typeOperationCaisseId', 't')
+                    ->addSelect('t')
+                ->andWhere('a.id = :agence')
+                ->orWhere('s.id = :sci')
+                ->andWhere('n.id = :nature')
+                ->andWhere('t.id = 8')
                 ->setParameter('nature', $natureId)
                 ->setParameter('agence', $agenceId)
                 ->setParameter('sci', $sciId)
@@ -78,8 +94,12 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     public function getPaiementsFactureByDatesAgenceSci($agenceId, $sciId, $startDate, $endDate)
     {
         return $this->createQueryBuilder('o')
-            ->where('o.agenceId = :agence')
-            ->orWhere('o.sciId = :sci')
+            ->leftJoin('o.agence', 'a')
+                ->addSelect('a')
+            ->leftJoin('o.sci', 's')
+                ->addSelect('s')
+            ->where('a.id = :agence')
+            ->orWhere('sci.id = :sci')
             ->andWhere('o.dateOperation BETWEEN :startDate AND :endDate')
             ->setParameter('agence', $agenceId)
             ->setParameter('sci', $sciId)
@@ -93,9 +113,15 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     {
         return $this->getAssocResults(
             $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->andWhere('o.agenceId = :agence')
-                ->orWhere('o.sciId = :sci')
-                ->andWhere('o.typeOperationCaisseId = :type')
+                ->leftJoin('o.agence', 'a')
+                    ->addSelect('a')
+                ->leftJoin('o.sci', 's')
+                    ->addSelect('s')
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->andWhere('a.id = :agence')
+                ->orWhere('s.id = :sci')
+                ->andWhere('t.id = :type')
                 ->setParameter('type', $type)
                 ->setParameter('agence', $agenceId)
                 ->setParameter('sci', $sciId)
@@ -106,8 +132,12 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     {
         return $this->getAssocResults(
             $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->andWhere('o.bienImmobilierId = :bienImmobilierId')
-                ->andWhere('o.typeOperationCaisseId = :type')
+                ->leftJoin('o.bienImmobilier', 'b')
+                    ->addSelect('b')
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->andWhere('b.id = :bienImmobilierId')
+                ->andWhere('t.id = :type')
                 ->setParameter('type', $type)
                 ->setParameter('bienImmobilierId', $bienImmobilierId)
         );
@@ -116,9 +146,11 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     public function buildPeriodQuery(string $start, string $end)
     {
         return $this->createQueryBuilder('o')
+            ->leftJoin('o.statusOperation', 'status')
+                ->addSelect('status')
             ->andWhere('o.dateOperation BETWEEN :startDate AND :endDate')
-            ->andWhere('o.operationAnnuleId is NULL')
-            ->andWhere('o.statusOperationId = 1')
+            ->andWhere('o.operationAnnule is NULL')
+            ->andWhere('status.id = 1')
             ->setParameter('startDate', $start)
             ->setParameter('endDate', $end);
     }
@@ -132,7 +164,9 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
     public function getPaiementsFactureByDatesClientSci($clientId, $startDate, $endDate)
     {
         return $this->createQueryBuilder('o')
-            ->where('o.clientId = :client')
+            ->leftJoin('o.client', 'c')
+                ->addSelect('c')
+            ->where('c.id = :client')
             ->andWhere('o.dateOperation BETWEEN :startDate AND :endDate')
             ->setParameter('client', $clientId)
             ->setParameter('startDate', $startDate)

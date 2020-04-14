@@ -112,7 +112,7 @@ class StatistiqueController extends ApiController
         }
 
         foreach ($list as $operation) {
-            $key = $operation['moyenPaiementCode'];
+            $key = $operation['moyenPaiement']['code'];
 
             if (array_key_exists($key, $groupedResults)) {
                 $groupedResults[$paymentMethods[$key]] += $operation['montant'];

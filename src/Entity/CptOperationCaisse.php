@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="cpt_operation_caisse", indexes={@ORM\Index(name="IDX_9A7BAA815332C612", columns={"coentre_depense_code"}), @ORM\Index(name="IDX_9A7BAA8132ECC4F2", columns={"type_operation_caisse_id"}), @ORM\Index(name="IDX_9A7BAA8119EB6921", columns={"client_id"}), @ORM\Index(name="IDX_9A7BAA818E122D7C", columns={"status_operation_id"}), @ORM\Index(name="IDX_9A7BAA81B2C090B7", columns={"operation_annule_id"}), @ORM\Index(name="IDX_9A7BAA813DC877FA", columns={"sci_id"}), @ORM\Index(name="IDX_9A7BAA81896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_9A7BAA81F2C56620", columns={"compte_id"}), @ORM\Index(name="IDX_9A7BAA814BCFA944", columns={"sous_centre_depense_code"}), @ORM\Index(name="IDX_9A7BAA81D725330D", columns={"agence_id"}), @ORM\Index(name="IDX_9A7BAA8195D9453A", columns={"journal_caisse_id"}), @ORM\Index(name="IDX_9A7BAA813BCB2E4B", columns={"nature_id"}), @ORM\Index(name="IDX_9A7BAA81B6885C6C", columns={"espace_id"}), @ORM\Index(name="IDX_9A7BAA81B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_9A7BAA815992120A", columns={"bien_immobilier_id"})})
  * @ORM\Entity(repositoryClass="App\Repository\CptOperationCaisseRepository")
  */
-class CptOperationCaisse
+class CptOperationCaisse extends BaseEntity
 {
     /**
      * @var int
@@ -26,95 +26,68 @@ class CptOperationCaisse
     private $id;
 
     /**
-     * @var int|null
+     * @var CptCompte|null
      *
-     * @ORM\Column(name="created_by_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptCompte")
+     * @ORM\JoinColumn(name="compte_id", referencedColumnName="id", nullable=true)
      */
-    private $createdById;
+    private $compte;
 
     /**
-     * @var int|null
+     * @var CptTypeOperationCaisse|null
      *
-     * @ORM\Column(name="updated_by_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptTypeOperationCaisse")
+     * @ORM\JoinColumn(name="type_operation_caisse_id", referencedColumnName="id", nullable=true)
      */
-    private $updatedById;
+    private $typeOperationCaisse;
 
     /**
-     * @var int|null
+     * @var AppAgence
      *
-     * @ORM\Column(name="compte_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="AppAgence")
+     * @ORM\JoinColumn(name="agence_id", referencedColumnName="id", nullable=false)
      */
-    private $compteId;
+    private $agence;
 
     /**
-     * @var int|null
+     * @var CmlClient|null
      *
-     * @ORM\Column(name="type_operation_caisse_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="CmlClient")
+     * @ORM\JoinColumn(name="client_id", referencedColumnName="id", nullable=true)
      */
-    private $typeOperationCaisseId;
+    private $client;
 
     /**
-     * @var int
+     * @var CptJournalCaisse|null
      *
-     * @ORM\Column(name="agence_id", type="integer", nullable=false)
+     * @ORM\ManyToOne(targetEntity="CptJournalCaisse")
+     * @ORM\JoinColumn(name="journal_caisse_id", referencedColumnName="id", nullable=true)
      */
-    private $agenceId;
+    private $journalCaisse;
 
     /**
-     * @var int|null
+     * @var CptStatusOperationCaisse|null
      *
-     * @ORM\Column(name="client_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptStatusOperationCaisse")
+     * @ORM\JoinColumn(name="status_operation_id", referencedColumnName="id", nullable=true)
      */
-    private $clientId;
+    private $statusOperation;
 
     /**
-     * @var int|null
+     * @var CptNatureOperationCaisse|null
      *
-     * @ORM\Column(name="journal_caisse_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptNatureOperationCaisse")
+     * @ORM\JoinColumn(name="nature_id", referencedColumnName="id", nullable=true)
      */
-    private $journalCaisseId;
+    private $nature;
 
     /**
-     * @var int|null
+     * @var CptOperationCaisse|null
      *
-     * @ORM\Column(name="status_operation_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptOperationCaisse")
+     * @ORM\JoinColumn(name="operation_annule_id", referencedColumnName="id", nullable=true)
      */
-    private $statusOperationId;
-
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="nature_id", type="integer", nullable=true)
-     */
-    private $natureId;
-
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="operation_annule_id", type="integer", nullable=true)
-     */
-    private $operationAnnuleId;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
-     */
-    private $createdAt;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    private $updatedAt;
-
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="archived", type="boolean", nullable=true, options={"comment"="Indique si l'élément est archivé"})
-     */
-    private $archived = '0';
+    private $operationAnnule;
 
     /**
      * @var float|null
@@ -187,11 +160,12 @@ class CptOperationCaisse
     private $dateOperation;
 
     /**
-     * @var int|null
+     * @var PatEspace|null
      *
-     * @ORM\Column(name="espace_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="PatEspace")
+     * @ORM\JoinColumn(name="espace_id", referencedColumnName="id", nullable=true)
      */
-    private $espaceId;
+    private $espace;
 
     /**
      * @var \DateTime|null
@@ -208,39 +182,44 @@ class CptOperationCaisse
     private $dateFin;
 
     /**
-     * @var int|null
+     * @var PatSci|null
      *
-     * @ORM\Column(name="sci_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="PatSci")
+     * @ORM\JoinColumn(name="sci_id", referencedColumnName="id", nullable=true)
      */
-    private $sciId;
+    private $sci;
 
     /**
-     * @var int|null
+     * @var PatBienImmobilier|null
      *
-     * @ORM\Column(name="bien_immobilier_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="PatBienImmobilier")
+     * @ORM\JoinColumn(name="bien_immobilier_id", referencedColumnName="id", nullable=true)
      */
-    private $bienImmobilierId;
+    private $bienImmobilier;
 
     /**
-     * @var string|null
+     * @var CptCentreDepense|null
      *
-     * @ORM\Column(name="coentre_depense_code", type="string", length=15, nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptCentreDepense")
+     * @ORM\JoinColumn(name="coentre_depense_code", referencedColumnName="code", nullable=true)
      */
-    private $coentreDepenseCode;
+    private $centreDepense;
 
     /**
-     * @var string|null
+     * @var CptSousCentreDepense|null
      *
-     * @ORM\Column(name="sous_centre_depense_code", type="string", length=15, nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptSousCentreDepense")
+     * @ORM\JoinColumn(name="sous_centre_depense_code", referencedColumnName="code", nullable=true)
      */
-    private $sousCentreDepenseCode;
+    private $sousCentreDepense;
 
     /**
-     * @var string|null
+     * @var CptMoyenPaiement|null
      *
-     * @ORM\Column(name="moyen_paiement_code", type="string", length=10, nullable=true)
+     * @ORM\ManyToOne(targetEntity="CptMoyenPaiement")
+     * @ORM\JoinColumn(name="moyen_paiement_code", referencedColumnName="code", nullable=true)
      */
-    private $moyenPaiementCode;
+    private $moyenPaiement;
 
     /**
      * @var string|null
@@ -257,20 +236,6 @@ class CptOperationCaisse
     private $banqueCompteBancaire;
 
     /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="enabled", type="boolean", nullable=true, options={"default"="1","comment"="Indique si l'élément est actif ou non"})
-     */
-    private $enabled = true;
-
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="deleted", type="boolean", nullable=true, options={"comment"="Indique si l'élément est supprimé"})
-     */
-    private $deleted = '0';
-
-    /**
      * @var string
      *
      * @ORM\Column(name="code_agence", type="string", length=10, nullable=false, options={"default"="DLA01"})
@@ -280,162 +245,6 @@ class CptOperationCaisse
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCreatedById(): ?int
-    {
-        return $this->createdById;
-    }
-
-    public function setCreatedById(?int $createdById): self
-    {
-        $this->createdById = $createdById;
-
-        return $this;
-    }
-
-    public function getUpdatedById(): ?int
-    {
-        return $this->updatedById;
-    }
-
-    public function setUpdatedById(?int $updatedById): self
-    {
-        $this->updatedById = $updatedById;
-
-        return $this;
-    }
-
-    public function getCompteId(): ?int
-    {
-        return $this->compteId;
-    }
-
-    public function setCompteId(?int $compteId): self
-    {
-        $this->compteId = $compteId;
-
-        return $this;
-    }
-
-    public function getTypeOperationCaisseId(): ?int
-    {
-        return $this->typeOperationCaisseId;
-    }
-
-    public function setTypeOperationCaisseId(?int $typeOperationCaisseId): self
-    {
-        $this->typeOperationCaisseId = $typeOperationCaisseId;
-
-        return $this;
-    }
-
-    public function getAgenceId(): ?int
-    {
-        return $this->agenceId;
-    }
-
-    public function setAgenceId(int $agenceId): self
-    {
-        $this->agenceId = $agenceId;
-
-        return $this;
-    }
-
-    public function getClientId(): ?int
-    {
-        return $this->clientId;
-    }
-
-    public function setClientId(?int $clientId): self
-    {
-        $this->clientId = $clientId;
-
-        return $this;
-    }
-
-    public function getJournalCaisseId(): ?int
-    {
-        return $this->journalCaisseId;
-    }
-
-    public function setJournalCaisseId(?int $journalCaisseId): self
-    {
-        $this->journalCaisseId = $journalCaisseId;
-
-        return $this;
-    }
-
-    public function getStatusOperationId(): ?int
-    {
-        return $this->statusOperationId;
-    }
-
-    public function setStatusOperationId(?int $statusOperationId): self
-    {
-        $this->statusOperationId = $statusOperationId;
-
-        return $this;
-    }
-
-    public function getNatureId(): ?int
-    {
-        return $this->natureId;
-    }
-
-    public function setNatureId(?int $natureId): self
-    {
-        $this->natureId = $natureId;
-
-        return $this;
-    }
-
-    public function getOperationAnnuleId(): ?int
-    {
-        return $this->operationAnnuleId;
-    }
-
-    public function setOperationAnnuleId(?int $operationAnnuleId): self
-    {
-        $this->operationAnnuleId = $operationAnnuleId;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getArchived(): ?bool
-    {
-        return $this->archived;
-    }
-
-    public function setArchived(?bool $archived): self
-    {
-        $this->archived = $archived;
-
-        return $this;
     }
 
     public function getSoldeAvantOperation(): ?float
@@ -558,18 +367,6 @@ class CptOperationCaisse
         return $this;
     }
 
-    public function getEspaceId(): ?int
-    {
-        return $this->espaceId;
-    }
-
-    public function setEspaceId(?int $espaceId): self
-    {
-        $this->espaceId = $espaceId;
-
-        return $this;
-    }
-
     public function getDateDebut(): ?\DateTimeInterface
     {
         return $this->dateDebut;
@@ -590,66 +387,6 @@ class CptOperationCaisse
     public function setDateFin(?\DateTimeInterface $dateFin): self
     {
         $this->dateFin = $dateFin;
-
-        return $this;
-    }
-
-    public function getSciId(): ?int
-    {
-        return $this->sciId;
-    }
-
-    public function setSciId(?int $sciId): self
-    {
-        $this->sciId = $sciId;
-
-        return $this;
-    }
-
-    public function getBienImmobilierId(): ?int
-    {
-        return $this->bienImmobilierId;
-    }
-
-    public function setBienImmobilierId(?int $bienImmobilierId): self
-    {
-        $this->bienImmobilierId = $bienImmobilierId;
-
-        return $this;
-    }
-
-    public function getCoentreDepenseCode(): ?string
-    {
-        return $this->coentreDepenseCode;
-    }
-
-    public function setCoentreDepenseCode(?string $coentreDepenseCode): self
-    {
-        $this->coentreDepenseCode = $coentreDepenseCode;
-
-        return $this;
-    }
-
-    public function getSousCentreDepenseCode(): ?string
-    {
-        return $this->sousCentreDepenseCode;
-    }
-
-    public function setSousCentreDepenseCode(?string $sousCentreDepenseCode): self
-    {
-        $this->sousCentreDepenseCode = $sousCentreDepenseCode;
-
-        return $this;
-    }
-
-    public function getMoyenPaiementCode(): ?string
-    {
-        return $this->moyenPaiementCode;
-    }
-
-    public function setMoyenPaiementCode(?string $moyenPaiementCode): self
-    {
-        $this->moyenPaiementCode = $moyenPaiementCode;
 
         return $this;
     }
@@ -678,30 +415,6 @@ class CptOperationCaisse
         return $this;
     }
 
-    public function getEnabled(): ?bool
-    {
-        return $this->enabled;
-    }
-
-    public function setEnabled(?bool $enabled): self
-    {
-        $this->enabled = $enabled;
-
-        return $this;
-    }
-
-    public function getDeleted(): ?bool
-    {
-        return $this->deleted;
-    }
-
-    public function setDeleted(?bool $deleted): self
-    {
-        $this->deleted = $deleted;
-
-        return $this;
-    }
-
     public function getCodeAgence(): ?string
     {
         return $this->codeAgence;
@@ -710,6 +423,174 @@ class CptOperationCaisse
     public function setCodeAgence(string $codeAgence): self
     {
         $this->codeAgence = $codeAgence;
+
+        return $this;
+    }
+
+    public function getCompte(): ?CptCompte
+    {
+        return $this->compte;
+    }
+
+    public function setCompte(?CptCompte $compte): self
+    {
+        $this->compte = $compte;
+
+        return $this;
+    }
+
+    public function getTypeOperationCaisse(): ?CptTypeOperationCaisse
+    {
+        return $this->typeOperationCaisse;
+    }
+
+    public function setTypeOperationCaisse(?CptTypeOperationCaisse $typeOperationCaisse): self
+    {
+        $this->typeOperationCaisse = $typeOperationCaisse;
+
+        return $this;
+    }
+
+    public function getAgence(): ?AppAgence
+    {
+        return $this->agence;
+    }
+
+    public function setAgence(?AppAgence $agence): self
+    {
+        $this->agence = $agence;
+
+        return $this;
+    }
+
+    public function getClient(): ?CmlClient
+    {
+        return $this->client;
+    }
+
+    public function setClient(?CmlClient $client): self
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    public function getJournalCaisse(): ?CptJournalCaisse
+    {
+        return $this->journalCaisse;
+    }
+
+    public function setJournalCaisse(?CptJournalCaisse $journalCaisse): self
+    {
+        $this->journalCaisse = $journalCaisse;
+
+        return $this;
+    }
+
+    public function getStatusOperation(): ?CptStatusOperationCaisse
+    {
+        return $this->statusOperation;
+    }
+
+    public function setStatusOperation(?CptStatusOperationCaisse $statusOperation): self
+    {
+        $this->statusOperation = $statusOperation;
+
+        return $this;
+    }
+
+    public function getNature(): ?CptNatureOperationCaisse
+    {
+        return $this->nature;
+    }
+
+    public function setNature(?CptNatureOperationCaisse $nature): self
+    {
+        $this->nature = $nature;
+
+        return $this;
+    }
+
+    public function getOperationAnnule(): ?self
+    {
+        return $this->operationAnnule;
+    }
+
+    public function setOperationAnnule(?self $operationAnnule): self
+    {
+        $this->operationAnnule = $operationAnnule;
+
+        return $this;
+    }
+
+    public function getEspace(): ?PatEspace
+    {
+        return $this->espace;
+    }
+
+    public function setEspace(?PatEspace $espace): self
+    {
+        $this->espace = $espace;
+
+        return $this;
+    }
+
+    public function getSci(): ?PatSci
+    {
+        return $this->sci;
+    }
+
+    public function setSci(?PatSci $sci): self
+    {
+        $this->sci = $sci;
+
+        return $this;
+    }
+
+    public function getBienImmobilier(): ?PatBienImmobilier
+    {
+        return $this->bienImmobilier;
+    }
+
+    public function setBienImmobilier(?PatBienImmobilier $bienImmobilier): self
+    {
+        $this->bienImmobilier = $bienImmobilier;
+
+        return $this;
+    }
+
+    public function getCentreDepense(): ?CptCentreDepense
+    {
+        return $this->centreDepense;
+    }
+
+    public function setCentreDepense(?CptCentreDepense $centreDepense): self
+    {
+        $this->centreDepense = $centreDepense;
+
+        return $this;
+    }
+
+    public function getSousCentreDepense(): ?CptSousCentreDepense
+    {
+        return $this->sousCentreDepense;
+    }
+
+    public function setSousCentreDepense(?CptSousCentreDepense $sousCentreDepense): self
+    {
+        $this->sousCentreDepense = $sousCentreDepense;
+
+        return $this;
+    }
+
+    public function getMoyenPaiement(): ?CptMoyenPaiement
+    {
+        return $this->moyenPaiement;
+    }
+
+    public function setMoyenPaiement(?CptMoyenPaiement $moyenPaiement): self
+    {
+        $this->moyenPaiement = $moyenPaiement;
 
         return $this;
     }
