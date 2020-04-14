@@ -51,7 +51,7 @@ class CptCheque extends BaseEntity
      * @ORM\ManyToOne(targetEntity="CptStatusCheque")
      * @ORM\JoinColumn(name="status_cheque_code", referencedColumnName="code", nullable=true)
      */
-    private $statusChequeCode;
+    private $statusCheque;
 
     /**
      * @var string
@@ -208,16 +208,15 @@ class CptCheque extends BaseEntity
         return $this;
     }
 
-    public function getStatusChequeCode(): ?CptStatusCheque
+    public function getStatusCheque(): ?CptStatusCheque
     {
-        return $this->statusChequeCode;
+        return $this->statusCheque;
     }
 
-    public function setStatusChequeCode(?CptStatusCheque $statusChequeCode): self
+    public function setStatusCheque(?CptStatusCheque $statusCheque): self
     {
-        $this->statusChequeCode = $statusChequeCode;
+        $this->statusCheque = $statusCheque;
 
         return $this;
     }
-
 }
