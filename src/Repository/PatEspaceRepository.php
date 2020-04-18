@@ -6,9 +6,13 @@
 
 namespace App\Repository;
 
-use App\Entity\PatEspace;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\CmlFacture;
+use App\Entity\CmlFactureEspace;
+use App\Entity\PatEspace;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Join;
 
 /**
  * @method PatEspace|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,33 +26,48 @@ class PatEspaceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, PatEspace::class);
     }
-
-    // /**
-    //  * @return PatEspace[] Returns an array of PatEspace objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getTauxOccupationByAgenceByNatureEspace(string $codeAgence, string $dateDebut = null, string $dateFin = null)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
+                    ->andWhere('e.codeAgence = :codeAgence')
+                    ->setParameter('codeAgence', $codeAgence)
+                    ->groupBy('e.natureEspace')
+                    ->select('n.libelle as type')
+                    ->addSelect('COUNT(n) as occupations')
+                    ->getQuery()->getScalarResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?PatEspace
+    public function getTauxOccupationByAgence(string $codeAgence, string $dateDebut = null, string $dateFin = null)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $this->getAssocResults(
+            $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->andWhere('e.codeAgence = :codeAgence')
+                ->setParameter('codeAgence', $codeAgence)
+        );
     }
-    */
+
+
+    public function buildPeriodQuery(string $start = null, string $end = null)
+    {
+        if (!$start) {
+            $start = (new \DateTime('-12 months'))->format('Y-m-d');
+        }
+        if (!$end) {
+            $end = (new \DateTime())->format('Y-m-d');
+        }
+
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.natureEspace', 'n')
+                ->addSelect('n')
+            ->leftJoin(CmlFactureEspace::class, 'factEspace', Join::WITH, 'factEspace.espace = e.id')
+            ->leftJoin(CmlFacture::class, 'f', Join::WITH, 'f.id = factEspace.facture')
+            ->andWhere('f.dateFacture BETWEEN :startDate AND :endDate')
+            ->setParameter('startDate', $start)
+            ->setParameter('endDate', $end);
+    }
+
+    public function getAssocResults(QueryBuilder $queryBuilder)
+    {
+        return $queryBuilder->getQuery()->getResult(\PDO::FETCH_ASSOC);
+    }
 }

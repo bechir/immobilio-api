@@ -23,32 +23,25 @@ class AppAgenceRepository extends ServiceEntityRepository
         parent::__construct($registry, AppAgence::class);
     }
 
-    // /**
-    //  * @return AppAgence[] Returns an array of AppAgence objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getAgences(string $startDate = null, string $endDate = null)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->buildPeriodQuery($startDate, $endDate)
+                ->leftJoin('a.ville', 'v')->addSelect('v')
+                ->getQuery()->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?AppAgence
+    public function buildPeriodQuery(string $start = null, string $end = null)
     {
+        if (!$start) {
+            $start = (new \DateTime('-12 months'))->format('Y-m-d');
+        }
+        if (!$end) {
+            $end = (new \DateTime())->format('Y-m-d');
+        }
+
         return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->andWhere('a.createdAt BETWEEN :startDate AND :endDate')
+            ->setParameter('startDate', $start)
+            ->setParameter('endDate', $end);
     }
-    */
 }

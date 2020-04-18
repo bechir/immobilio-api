@@ -6,10 +6,20 @@
 
 namespace App\Repository;
 
+use App\Entity\AppAgence;
+use App\Entity\CmlClient;
+use App\Entity\CmlFacture;
+use App\Entity\CmlFactureEspace;
+use App\Entity\CmlTypeClient;
 use App\Entity\CptOperationCaisse;
+use App\Entity\PatBienImmobilier;
+use App\Entity\PatEspace;
+use App\Entity\PatSci;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\Expr\Join;
+use PDO;
 
 /**
  * @method CptOperationCaisse|null find($id, $lockMode = null, $lockVersion = null)
@@ -24,38 +34,113 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
         parent::__construct($registry, CptOperationCaisse::class);
     }
 
-    public function getEtatPaiementsFactureAgenceSci(int $agenceId, int $sciId, string $dateDebut, string $dateFin)
+    public function getEtatPaiementsFactureAgenceSci(int $agenceId, int $sciId, string $dateDebut = null, string $dateFin = null)
     {
         return $this->getEtat__TYPE__ByAgenceSci($agenceId, $sciId, $dateDebut, $dateFin, 6);
     }
 
-    public function getEtatPaiementFacturesBienImmobilier(int $bienImmobilierId, string $dateDebut, string $dateFin)
+    public function getEtatPaiementsFactureAgence(int $agenceId, string $dateDebut = null, string $dateFin = null)
     {
-        return $this->getEtat__TYPE__BienImmobilier($bienImmobilierId, $dateDebut, $dateFin, 6);
+        return $this->getAssocResults(
+            $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.agence', 'a')
+                    ->addSelect('a')
+                ->leftJoin('o.sci', 's')
+                    ->addSelect('s')
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->andWhere('a.id = :agence')
+                ->andWhere('t.id = 6')
+                ->setParameter('agence', $agenceId)
+        );
+    }
+
+    public function getEtatPaiementsFactureSci(int $sciId, string $dateDebut = null, string $dateFin = null)
+    {
+        return $this->getAssocResults(
+            $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->leftJoin(PatSci::class, 'pat', Join::WITH, 'pat.codeAgence = o.codeAgence')
+                ->andWhere('t.id = 6')
+                ->andWhere('pat.id = :sci')
+                ->setParameter('sci', $sciId)
+        );
+    }
+
+    public function getEtatPaiementFacturesBienImmobilier(int $bienImmobilierId, string $dateDebut = null, string $dateFin = null)
+    {
+        return $this->getAssocResults(
+            $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->leftJoin(CmlFacture::class, 'f', Join::WITH, 'f.reference = o.numFacturePiece')
+                ->leftJoin(CmlFactureEspace::class, 'espace', Join::WITH, 'espace.facture = f.id')
+                ->leftJoin(PatEspace::class, 'pat', Join::WITH, 'pat.id = espace.espace')
+                ->leftJoin(PatBienImmobilier::class, 'bien', Join::WITH, 'bien.id = pat.bienImmobilier')
+                ->andWhere('t.id = 6')
+                ->andWhere('bien.id = :id')
+                ->setParameter('id', $bienImmobilierId)
+                ->andWhere('o.dateOperation BETWEEN :start AND :end')
+                ->setParameter('start', $dateDebut)
+                ->setParameter('end', $dateFin)
+        );
     }
 
     public function getEtatPaiementFacturesModePaiement($dateDebut, $dateFin)
     {
-        return $this->buildPeriodQuery($dateDebut, $dateFin)
-            ->leftJoin('o.typeOperationCaisse', 'typeOperation')
-                ->addSelect('typeOperation')
-            ->leftJoin('o.moyenPaiement', 'm')
-                ->addSelect('m')
-            ->andWhere('typeOperation.id = 6')
-            ->getQuery()->getResult(\PDO::FETCH_ASSOC);
+        return $this->getAssocResults(
+            $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.typeOperationCaisse', 'typeOperation')
+                    ->addSelect('typeOperation')
+                ->leftJoin('o.moyenPaiement', 'm')
+                    ->addSelect('m')
+                ->andWhere('typeOperation.id = 6')
+        );
     }
 
-    public function getEtatDepensesAgenceSci(int $agenceId, int $sciId, string $dateDebut, string $dateFin)
+    public function getEtatDepensesAgence(int $agenceId, string $dateDebut = null, string $dateFin = null, $assoc = true)
     {
-        return $this->getEtat__TYPE__ByAgenceSci($agenceId, $sciId, $dateDebut, $dateFin, 8);
+        $qb = $this->buildPeriodQuery($dateDebut, $dateFin)
+            ->leftJoin('o.agence', 'a')
+                ->addSelect('a')
+            ->leftJoin('o.typeOperationCaisse', 't')
+                ->addSelect('t')
+            ->andWhere('a.id = :agence')
+            ->andWhere('t.id = 8')
+            ->setParameter('agence', $agenceId);
+
+        return $assoc ? $this->getAssocResults($qb) : $qb->getQuery()->getResult();
     }
 
-    public function getEtatDepensesBienImmobilier(int $bienImmobilierId, string $dateDebut, string $dateFin)
+    public function getEtatDepensesSci(int $sciId, string $dateDebut = null, string $dateFin = null)
     {
-        return $this->getEtat__TYPE__BienImmobilier($bienImmobilierId, $dateDebut, $dateFin, 8);
+        return $this->getAssocResults(
+            $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->leftJoin(PatSci::class, 'pat', Join::WITH, 'pat.codeAgence = o.codeAgence')
+                ->andWhere('t.id = 8')
+                ->andWhere('pat.id = :sci')
+                ->setParameter('sci', $sciId)
+        );
     }
 
-    public function getEtatDepensesNatureDepense(int $natureId, string $dateDebut, string $dateFin)
+    public function getEtatDepensesBienImmobilier(int $bienImmobilierId, string $dateDebut = null, string $dateFin = null)
+    {
+        return $this->getAssocResults(
+            $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.bienImmobilier', 'b')
+                    ->addSelect('b')
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->andWhere('b.id = :bienImmobilierId')
+                ->andWhere('t.id = 8')
+                ->setParameter('bienImmobilierId', $bienImmobilierId)
+        );
+    }
+
+    public function getEtatDepensesPourUneNatureDepense(int $natureId, string $dateDebut = null, string $dateFin = null)
     {
         return $this->getAssocResults(
             $this->buildPeriodQuery($dateDebut, $dateFin)
@@ -69,7 +154,25 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
         );
     }
 
-    public function getEtatDepensesNatureDepenseAgenceSci(int $natureId, int $agenceId, int $sciId, string $dateDebut, string $dateFin)
+    public function getEtatDepensesParNatureDepense($agenceId = null, string $dateDebut = null, string $dateFin = null)
+    {
+        $qb =  $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.nature', 'n')
+                    ->addSelect('n')
+                ->leftJoin('o.typeOperationCaisse', 't')
+                    ->addSelect('t')
+                ->andWhere('t.id = 8');
+        if($agenceId != null) {
+            $qb->leftJoin('o.agence', 'a')
+                ->addSelect('a')
+            ->andWhere('a.id = :id')
+            ->setParameter('id', $agenceId);
+        }
+
+        return $this->getAssocResults($qb);
+    }
+
+    public function getEtatDepensesNatureDepenseAgenceSci(int $natureId, int $agenceId, int $sciId, string $dateDebut = null, string $dateFin = null)
     {
         return $this->getAssocResults(
             $this->buildPeriodQuery($dateDebut, $dateFin)
@@ -79,7 +182,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
                     ->addSelect('n')
                 ->leftJoin('o.sci', 's')
                     ->addSelect('s')
-                ->leftJoin('o.typeOperationCaisseId', 't')
+                ->leftJoin('o.typeOperationCaisse', 't')
                     ->addSelect('t')
                 ->andWhere('a.id = :agence')
                 ->orWhere('s.id = :sci')
@@ -91,7 +194,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
         );
     }
 
-    public function getPaiementsFactureByDatesAgenceSci($agenceId, $sciId, $startDate, $endDate)
+    public function getPaiementsFactureByDatesAgenceSci($agenceId, $sciId, $startDate = null, $endDate = null)
     {
         return $this->createQueryBuilder('o')
             ->leftJoin('o.agence', 'a')
@@ -109,42 +212,43 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    private function getEtat__TYPE__ByAgenceSci(int $agenceId, int $sciId, string $dateDebut, string $dateFin, $type)
+    public function getEncaissementParAgence(string $dateDebut = null, string $dateFin = null)
     {
-        return $this->getAssocResults(
-            $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->leftJoin('o.agence', 'a')
-                    ->addSelect('a')
-                ->leftJoin('o.sci', 's')
-                    ->addSelect('s')
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
                 ->leftJoin('o.typeOperationCaisse', 't')
                     ->addSelect('t')
-                ->andWhere('a.id = :agence')
-                ->orWhere('s.id = :sci')
-                ->andWhere('t.id = :type')
-                ->setParameter('type', $type)
-                ->setParameter('agence', $agenceId)
-                ->setParameter('sci', $sciId)
-        );
+                ->leftJoin(AppAgence::class, 'a', Join::WITH, 'a.code = o.codeAgence')
+                ->groupBy('o.codeAgence')
+                ->select('a.nom as name')
+                ->addSelect('SUM(o.montant) as total')
+                ->andWhere('t.id = 7')
+                ->getQuery()->getResult()
+        ;
     }
 
-    public function getEtat__TYPE__BienImmobilier(int $bienImmobilierId, string $dateDebut, string $dateFin, $type)
+    public function getEncaissementParTypeClient(string $dateDebut = null, string $dateFin = null)
     {
-        return $this->getAssocResults(
-            $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->leftJoin('o.bienImmobilier', 'b')
-                    ->addSelect('b')
-                ->leftJoin('o.typeOperationCaisse', 't')
-                    ->addSelect('t')
-                ->andWhere('b.id = :bienImmobilierId')
-                ->andWhere('t.id = :type')
-                ->setParameter('type', $type)
-                ->setParameter('bienImmobilierId', $bienImmobilierId)
-        );
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
+                ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+                ->leftJoin('o.client', 'c')->addSelect('c')
+                ->leftJoin(CmlTypeClient::class, 'typeClient', Join::WITH, 'typeClient.id = c.typeClient')
+                ->select('typeClient.libelle as label')
+                ->addSelect('SUM(o.montant) as total')
+                ->andWhere('t.id = 7')
+                ->groupBy('typeClient')
+                ->getQuery()->getResult(PDO::FETCH_ASSOC)
+        ;
     }
 
-    public function buildPeriodQuery(string $start, string $end)
+    public function buildPeriodQuery(string $start = null, string $end = null)
     {
+        if (!$start) {
+            $start = (new \DateTime('-12 months'))->format('Y-m-d');
+        }
+        if (!$end) {
+            $end = (new \DateTime())->format('Y-m-d');
+        }
+
         return $this->createQueryBuilder('o')
             ->leftJoin('o.statusOperation', 'status')
                 ->addSelect('status')
@@ -157,21 +261,6 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
 
     public function getAssocResults(QueryBuilder $queryBuilder)
     {
-        return $queryBuilder->getQuery()
-            ->getResult(\PDO::FETCH_ASSOC);
-    }
-
-    public function getPaiementsFactureByDatesClientSci($clientId, $startDate, $endDate)
-    {
-        return $this->createQueryBuilder('o')
-            ->leftJoin('o.client', 'c')
-                ->addSelect('c')
-            ->where('c.id = :client')
-            ->andWhere('o.dateOperation BETWEEN :startDate AND :endDate')
-            ->setParameter('client', $clientId)
-            ->setParameter('startDate', $startDate)
-            ->setParameter('endDate', $endDate)
-            ->getQuery()
-            ->getResult();
+        return $queryBuilder->getQuery()->getResult(\PDO::FETCH_ASSOC);
     }
 }

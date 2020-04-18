@@ -7,35 +7,63 @@
 namespace App\Controller\Api;
 
 use App\Repository\PatBienImmobilierRepository;
+use App\Repository\PatEspaceRepository;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 class BienImmobilierController extends ApiController
 {
     /**
+     * @var PatEspaceRepository
+     */
+    private $patEspaceRepository;
+
+    /**
+     * Constructor.
+     *
+     * @var PatEspaceRepository
+     */
+    public function __construct(PatEspaceRepository $patEspaceRepository)
+    {
+        $this->patEspaceRepository = $patEspaceRepository;
+    }
+
+    /**
      * taux d'occupation des immeubles par Agence ou par SCI.
      * Il permet de regrouper les immeubles d'une SCI et calculer le taux d'occupation par SCI.
      * Les sommes seront aggrégées par mois.
      * Retourne les résultats des 12 derniers mois si les dates sont nulles.
      *
-     * @param int            agenceId: Identifiant de l'agence
+     * @param int            codeAgence: Le code de l'agence
      * @param string|null    dateDebut: Date de début
      * @param string|null    dateFin: date de fin
      *
-     * @Route("/bien-immobilier/etat/taux-occupation/agence/{agenceId}/{dateDebut}/{dateFin}")
+     * @Route("/bien-immobilier/etat/taux-occupation/agence/{codeAgence}/{dateDebut}/{dateFin}")
      */
-    public function getTauxOccupationByAgence(int $agenceId, string $dateDebut = null, string $dateFin = null)
+    public function getTauxOccupationByAgence(string $codeAgence, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
-        }
+        $espaces = $this->patEspaceRepository->getTauxOccupationByAgence($codeAgence, $dateDebut, $dateFin);
 
-        $operations = $this->operationRepository->getTauxOccupationByAgence($agenceId, $dateDebut, $dateFin);
+        return $this->json($espaces);
+    }
 
-        return $this->json($operations);
+    /**
+     * taux d'occupation des espaces par Agence, regroupés par nature.
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param int            codeAgence: Le code de l'agence
+     * @param string|null    dateDebut: Date de début
+     * @param string|null    dateFin: date de fin
+     *
+     * @Route("/bien-immobilier/etat/taux-occupation/par-nature/agence/{codeAgence}/{dateDebut}/{dateFin}")
+     */
+    public function getTauxOccupationByAgenceByNatureEspace(string $codeAgence, string $dateDebut = null, string $dateFin = null)
+    {
+        $espaces = $this->patEspaceRepository->getTauxOccupationByAgenceByNatureEspace($codeAgence, $dateDebut, $dateFin);
+
+        array_multisort($espaces, SORT_NUMERIC);
+
+        return $this->json($espaces);
     }
 
     /**
@@ -57,7 +85,7 @@ class BienImmobilierController extends ApiController
             $dateFin = (new DateTime())->format('Y-m-d');
         }
 
-        $operations = $this->operationRepository->getTauxOccupationBySci($sciId, $dateDebut, $dateFin);
+        $operations = $this->patEspaceRepository->getTauxOccupationBySci($sciId, $dateDebut, $dateFin);
 
         return $this->json($operations);
     }

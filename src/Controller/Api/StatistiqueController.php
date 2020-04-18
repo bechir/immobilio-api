@@ -6,9 +6,12 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\CptOperationCaisse;
 use App\Repository\CptMoyenPaiementRepository;
+use App\Repository\CptNatureOperationCaisseRepository;
 use App\Repository\CptOperationCaisseRepository;
-use DateTime;
+use App\Repository\PatSciRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -33,29 +36,39 @@ class StatistiqueController extends ApiController
     }
 
     /**
-     * La somme des paiements de factures sur une période (année) par Agence ou SCI.
+     * La somme des paiements de factures sur une période (année) par Agence.
      * Les sommes seront aggrégées par mois
      * Retourne les résultats des 12 derniers mois si les dates sont nulles.
      *
      * @param int           agenceId: Identifiant de l'agence
+     * @param string|null   dateDebut: Date de début
+     * @param string|null   dateFin: date de fin
+     *
+     * @Route("/paiement-factures/etat/agence/{agenceId}/{dateDebut}/{dateFin}")
+     */
+    public function getEtatPaiementsFactureAgence(int $agenceId, string $dateDebut = null, string $dateFin = null)
+    {
+        $operations = $this->operationRepository->getEtatPaiementsFactureAgence($agenceId, $dateDebut, $dateFin);
+
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
+    }
+
+    /**
+     * La somme des paiements de factures sur une période (année) par SCI.
+     * Les sommes seront aggrégées par mois
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
      * @param int           sciId: Identifiant du Sci
      * @param string|null   dateDebut: Date de début
-     * @param string|mull   dateFin: date de fin
+     * @param string|null   dateFin: date de fin
      *
-     * @Route("/paiement-factures/etat/agence/{agenceId}/{sciId}/{dateDebut}/{dateFin}")
+     * @Route("/paiement-factures/etat/sci/{sciId}/{dateDebut}/{dateFin}")
      */
-    public function getEtatPaiementsFactureAgenceSci(int $agenceId, int $sciId, string $dateDebut = null, string $dateFin = null)
+    public function getEtatPaiementsFactureSci(int $sciId, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
-        }
+        $operations = $this->operationRepository->getEtatPaiementsFactureSci($sciId, $dateDebut, $dateFin);
 
-        $operations = $this->operationRepository->getEtatPaiementsFactureAgenceSci($agenceId, $sciId, $dateDebut, $dateFin);
-
-        return $this->json($this->groundAndSumOperations($operations));
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
     }
 
     /**
@@ -71,16 +84,9 @@ class StatistiqueController extends ApiController
      */
     public function getEtatPaiementFacturesBienImmobilier(int $bienImmobilierId, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
-        }
-
         $operations = $this->operationRepository->getEtatPaiementFacturesBienImmobilier($bienImmobilierId, $dateDebut, $dateFin);
 
-        return $this->json($this->groundAndSumOperations($operations));
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
     }
 
     /**
@@ -95,64 +101,85 @@ class StatistiqueController extends ApiController
      */
     public function getEtatPaiementFacturesModePaiement(CptMoyenPaiementRepository $cptMoyenPaiementRepository, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
-        }
-
         $list = $this->operationRepository->getEtatPaiementFacturesModePaiement($dateDebut, $dateFin);
 
-        $paymentMethods = [];
-
-        foreach ($cptMoyenPaiementRepository->findAll() as $method) {
-            $paymentMethods[$method->getCode()] = $method->getLibelle();
-        }
-
-        $grouped = [];
-
-        foreach ($list as $operation) {
-            $month = $operation['dateOperation']->format('Y-m');
-            $key = $paymentMethods[$operation['moyenPaiement']['code']];
-
-            if (array_key_exists($month, $grouped)) {
-                if (array_key_exists($key, $grouped[$month])) {
-                    $grouped[$month][$key] += $operation['montant'];
-                } else {
-                    $grouped[$month][$key] = $operation['montant'];
-                }
-            } else {
-                $grouped[$month][$key] = $operation['montant'];
-            }
-        }
-
-        return $this->json($grouped);
+        return $this->json(
+            $this->totalizeByMonth($list, $cptMoyenPaiementRepository, 'moyenPaiement', 'code', 'libelle')
+        );
     }
 
     /**
-     * La somme des dépenses réalisées sur une période (année) par Agence ou SCI
+     * La somme des dépenses réalisées sur une période (année) par SCI
      * Retourne les résultats des 12 derniers mois si les dates sont nulles.
      *
-     * @param int            agenceId: Identifiant de l'agence
      * @param int            sciId: Identifiant du Sci
      * @param string|null    dateDebut: Date de début
      * @param string|null    dateFin: date de fin
      *
-     * @Route("/operation-caisse/depense/etat/agence/{agenceId}/{sciId}/{dateDebut}/{dateFin}")
+     * @Route("/operation-caisse/depense/etat/sci/{sciId}/{dateDebut}/{dateFin}")
      */
-    public function getEtatDepensesAgenceSci(int $agenceId, int $sciId, string $dateDebut = null, string $dateFin = null)
+    public function getEtatDepensesSci(int $sciId, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
+        $operations = $this->operationRepository->getEtatDepensesSci($sciId, $dateDebut, $dateFin);
+
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
+    }
+
+    /**
+     * La somme des dépenses réalisées sur une période (année) par Agence
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param int            agenceId: Identifiant de l'agence
+     * @param string|null    dateDebut: Date de début
+     * @param string|null    dateFin: date de fin
+     *
+     * @Route("/operation-caisse/depense/etat/agence/{agenceId}/{dateDebut}/{dateFin}")
+     */
+    public function getEtatDepensesAgence(int $agenceId, string $dateDebut = null, string $dateFin = null)
+    {
+        $operations = $this->operationRepository->getEtatDepensesAgence($agenceId, $dateDebut, $dateFin);
+
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
+    }
+
+    /**
+     * La somme des dépenses réalisées sur une période (année) par Agence, flitré par SCI
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param int            agenceId: Identifiant de l'agence
+     * @param string|null    dateDebut: Date de début
+     * @param string|null    dateFin: date de fin
+     *
+     * @Route("/operation-caisse/depense/etat/agence-filtre-par-sci/{agenceId}/{dateDebut}/{dateFin}")
+     */
+    public function getEtatDepensesAgenceParSci(PatSciRepository $sciRepository, int $agenceId, string $dateDebut = null, string $dateFin = null)
+    {
+        $operations = $this->operationRepository->getEtatDepensesAgence($agenceId, $dateDebut, $dateFin, false);
+
+        if(!$operations)
+            return $this->json(null);
+
+        $scisAgence = $sciRepository->findBy(['codeAgence' => $operations[0]->getCodeAgence()]);
+
+        $grouped = [];
+
+        foreach ($scisAgence as $sci) {
+            $grouped[$sci->getLibelle()] = $this->initializeMonths($dateDebut, $dateFin);
+
+            foreach ($operations as $operation) {
+                if($operation->getSci() && $operation->getSci()->getId() == $sci->getId()) {
+                    foreach (array_keys($grouped[$sci->getLibelle()]) as $date) {
+                        if($date == $operation->getDateOperation()->format('Y-m')) {
+                            $grouped[$sci->getLibelle()][$date] += $operation->getMontant();
+                        }
+                    }
+                }
+            }
         }
 
-        $operations = $this->operationRepository->getEtatDepensesAgenceSci($agenceId, $sciId, $dateDebut, $dateFin);
+        return $this->json($grouped);
 
-        return $this->json($this->groundAndSumOperations($operations));
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
     }
 
     /**
@@ -167,20 +194,13 @@ class StatistiqueController extends ApiController
      */
     public function getEtatDepensesBienImmobilier(int $bienImmobilierId, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
-        }
-
         $operations = $this->operationRepository->getEtatDepensesBienImmobilier($bienImmobilierId, $dateDebut, $dateFin);
 
-        return $this->json($this->groundAndSumOperations($operations));
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
     }
 
     /**
-     * La somme des dépenses réalisées sur une période (année) par nature de la dépenses.
+     * La somme des dépenses réalisées sur une période (année) pour une nature de dépenses.
      * Retourne les résultats des 12 derniers mois si les dates sont nulles.
      *
      * @param int           natureId: Identifiant de la nature de dépense
@@ -189,18 +209,61 @@ class StatistiqueController extends ApiController
      *
      * @Route("/operation-caisse/depense/etat/nature-depense/{natureId}/{dateDebut}/{dateFin}")
      */
-    public function getEtatDepensesNatureDepense(int $natureId, string $dateDebut = null, string $dateFin = null)
+    public function getEtatDepensesPourUneNatureDepense(int $natureId, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
+        $operations = $this->operationRepository->getEtatDepensesPourUneNatureDepense($natureId, $dateDebut, $dateFin);
+
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
+    }
+
+    /**
+     * La somme des dépenses réalisées sur une période (année) par nature de la dépenses.
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param string|null   dateDebut: Date de début
+     * @param string|null   dateFin: date de fin
+     *
+     * @Route("/operation-caisse/depense/etat/nature-depense/{dateDebut}/{dateFin}")
+     */
+    public function getEtatDepensesParNatureDepense(CptNatureOperationCaisseRepository $natureRepository, string $dateDebut = null, string $dateFin = null)
+    {
+        $list = $this->operationRepository->getEtatDepensesParNatureDepense($dateDebut, $dateFin);
+
+        return $this->json(
+            $this->totalizeByMonth($list, $natureRepository, 'nature', 'id', 'label')
+        );
+    }
+
+    /**
+     * La somme des dépenses réalisées sur une période (année) par nature de la dépense pour une agence.
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param int           agenceId: Identifiant de l'agence
+     * @param string|null   dateDebut: Date de début
+     * @param string|null   dateFin: date de fin
+     *
+     * @Route("/operation-caisse/depense/etat/nature-depense-par-agence/{agenceId}/{dateDebut}/{dateFin}")
+     */
+    public function getEtatDepensesParNatureDepenseParAgence(CptNatureOperationCaisseRepository $natureRepository, int $agenceId, string $dateDebut = null, string $dateFin = null)
+    {
+        $list = $this->operationRepository->getEtatDepensesParNatureDepense($agenceId, $dateDebut, $dateFin);
+
+        $data = [];
+
+        foreach ($natureRepository->findAll() as $nature) {
+            $data[$nature->getLabel()] = 0;
         }
 
-        $operations = $this->operationRepository->getEtatDepensesNatureDepense($natureId, $dateDebut, $dateFin);
+        foreach ($list as $operation) {
+            $key = $operation['nature']['label'];
+            if(array_key_exists($key, $data)) {
+                $data[$key] += $operation['montant'];
+            } else {
+                $data[$key] = $operation['montant'];
+            }
+        }
 
-        return $this->json($this->groundAndSumOperations($operations));
+        return $this->json($data);
     }
 
     /**
@@ -217,32 +280,139 @@ class StatistiqueController extends ApiController
      */
     public function getEtatDepensesNatureDepenseAgenceSci(int $natureId, int $agenceId, int $sciId, string $dateDebut = null, string $dateFin = null)
     {
-        if (!$dateDebut) {
-            $dateDebut = (new DateTime('-12 months'))->format('Y-m-d');
-        }
-        if (!$dateFin) {
-            $dateFin = (new DateTime())->format('Y-m-d');
-        }
-
         $operations = $this->operationRepository->getEtatDepensesNatureDepenseAgenceSci($natureId, $agenceId, $sciId, $dateDebut, $dateFin);
 
-        return $this->json($this->groundAndSumOperations($operations));
+        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
     }
 
-    private function groundAndSumOperations($operations)
+    /**
+     * La somme des encaissements sur une période (année) par agence.
+     * Les sommes seront aggrégées par mois
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param string|null   dateDebut: Date de début
+     * @param string|null   dateFin: date de fin
+     *
+     * @Route("/operation-caisse/encaissement/etat/par-agence/{dateDebut}/{dateFin}")
+     */
+    public function getEncaissementParAgence(string $dateDebut = null, string $dateFin = null)
     {
-        $grouped = [];
+        return $this->json(
+            $this->operationRepository->getEncaissementParAgence($dateDebut, $dateFin)
+        );
+    }
+
+    /**
+     * La somme des encaissements sur une période (année) par type de client.
+     * Les sommes seront aggrégées par mois
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param string|null   dateDebut: Date de début
+     * @param string|null   dateFin: date de fin
+     *
+     * @Route("/operation-caisse/encaissement/etat/par-type-client/{dateDebut}/{dateFin}")
+     */
+    public function getEncaissementParTypeClient(string $dateDebut = null, string $dateFin = null)
+    {
+        return $this->json(
+            $this->operationRepository->getEncaissementParTypeClient($dateDebut, $dateFin)
+        );
+    }
+
+    private function groundAndSumOperations($operations, $startDate = null, $endDate = null)
+    {
+        if(!$operations)
+            return null;
+
+        $grouped = $this->initializeMonths($startDate, $endDate);
 
         foreach ($operations as $operation) {
             $key = $operation['dateOperation']->format('Y-m');
-
-            if (array_key_exists($key, $grouped)) {
-                $grouped[$key] += $operation['montant'];
-            } else {
-                $grouped[$key] = $operation['montant'];
-            }
+            $grouped[$key] += $operation['montant'];
         }
 
         return $grouped;
+    }
+
+    /**
+     * Group and totalize entires by month and by given category
+     * 
+     * @param CptOperationCaisse[] $operations
+     * @param ServiceEntityRepository
+     * @param string $properyName: property that refer to categories
+     * @param string $code 
+     * @param string $label: The label to display in result categories
+     * @return array|null
+     */
+    public function totalizeByMonth(array $operations, ServiceEntityRepository $classRepository, string $properyName, string $code, string $label, $startDate = null, $endDate = null)
+    {
+        if(empty($operations)) {
+            return null;
+        }
+
+        $keys = [];
+
+        foreach ($classRepository->findAll() as $key) {
+            $key = $this->dismount($key);
+            $keys[$key[$code]] = $key[$label];
+        }
+
+        $months = $this->initializeMonths($startDate, $endDate);
+
+        $grouped = array_combine(array_keys($months), array_map(function($month) use($keys){
+            return array_fill_keys($keys, 0);
+        }, $months));
+
+        foreach ($operations as $operation) {
+            $month = $operation['dateOperation']->format('Y-m');
+            $key = $keys[$operation[$properyName][$code]];
+            $grouped[$month][$key] += $operation['montant'];
+        }
+
+        return $grouped;
+    }
+
+    public function initializeMonths(string $begin = null, string $end = null)
+    {
+        if(!$begin) {
+            $begin = new \DateTime('-6 months');
+        } else {
+            $begin = \DateTime::createFromFormat('Y-m', $begin);
+        }
+        if(!$end) {
+            $end = new \DateTime();
+        } else {
+            $begin = \DateTime::createFromFormat('Y-m', $end);
+        }
+
+        $array = [];
+
+        for($i = $begin; $i <= $end; $i->modify('+1 month')){
+            $array[$i->format("Y-m")] = 0;
+        }
+        // for($i = 1; $i <= 12; $i++) {
+        //     $key = $begin->format('Y') . '-' . ($i > 9 ? $i : ('0' . $i));
+        //     $array[$key] = 0;
+        // }
+
+        return $array;
+    }
+
+    /**
+     * Convert a PHP object to an associative array
+     * https://stackoverflow.com/questions/4345554/convert-a-php-object-to-an-associative-array#answer-16023589
+     * 
+     * @param object
+     * @return array
+     */
+    public function dismount($object) {
+        $reflectionClass = new \ReflectionClass(get_class($object));
+        $array = array();
+        foreach ($reflectionClass->getProperties() as $property) {
+            $property->setAccessible(true);
+            $array[$property->getName()] = $property->getValue($object);
+            $property->setAccessible(false);
+        }
+        return $array;
     }
 }

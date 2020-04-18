@@ -7,6 +7,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\VirtualProperty;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\SerializedName;
 
 /**
  * AppAgence.
@@ -22,6 +25,8 @@ class AppAgence extends BaseEntity
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * 
+     * @Groups({"list", "details"})
      */
     private $id;
 
@@ -37,6 +42,9 @@ class AppAgence extends BaseEntity
      * @var string
      *
      * @ORM\Column(name="nom", type="string", length=255, nullable=false)
+     * 
+     * @Groups({"list", "details"})
+     * @SerializedName("name")
      */
     private $nom;
 
@@ -44,6 +52,8 @@ class AppAgence extends BaseEntity
      * @var string
      *
      * @ORM\Column(name="code", type="string", length=10, nullable=false, options={"default"="DLA01"})
+     * 
+     * @Groups({"list", "details"})
      */
     private $code = 'DLA01';
 
@@ -86,5 +96,19 @@ class AppAgence extends BaseEntity
         $this->ville = $ville;
 
         return $this;
+    }
+
+    /**
+     * @VirtualProperty
+     * @SerializedName("ville")
+     * @Groups({"list", "details"})
+     */
+    public function apiVille()
+    {
+        return $this->ville ? [
+            'id'    => $this->ville->getId(),
+            'code'  => $this->ville->getCode(),
+            'name'  => $this->ville->getNom()
+        ] : '';
     }
 }
