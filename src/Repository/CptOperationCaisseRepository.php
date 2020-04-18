@@ -240,6 +240,20 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getOperationsByType(string $startDate = null, string $endDate = null)
+    {
+        return $this->buildPeriodQuery($startDate, $endDate)
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->select('SUBSTRING(o.dateOperation, 1, 7) as month')
+            ->addSelect('SUM(o.montant) as value')
+            ->addSelect('t.code')
+            ->addSelect('t.label')
+            ->groupBy('month')
+            ->addGroupBy('o.typeOperationCaisse')
+            ->getQuery()->getResult();
+    }
+
+
     public function buildPeriodQuery(string $start = null, string $end = null)
     {
         if (!$start) {

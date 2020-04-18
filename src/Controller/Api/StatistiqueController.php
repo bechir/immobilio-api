@@ -319,10 +319,48 @@ class StatistiqueController extends ApiController
         );
     }
 
+    /**
+     * Evolutions des operations par type d'operation
+     * Les sommes seront aggrégées par mois
+     * Retourne les résultats des 12 derniers mois si les dates sont nulles.
+     *
+     * @param string|null   dateDebut: Date de début
+     * @param string|null   dateFin: date de fin
+     *
+     * @Route("/operation-caisse/par-type-operation/{dateDebut}/{dateFin}")
+     */
+    public function getOperationsByType(string $dateDebut = null, string $dateFin = null)
+    {
+        $operations = $this->operationRepository->getOperationsByType($dateDebut, $dateFin);
+        $grouped = [];
+        
+        $grouped = array_fill_keys(
+            array_unique(
+                array_map(function($o) {
+                    return $o['label'];
+                }, $operations)
+            ),
+        []);
+
+        foreach($operations as $operation) {
+            $key = $operation['label'];
+            $sub = $operation['month'];
+            $grouped[$key][$sub] = $operation['value'];
+        }
+
+        return $this->json($grouped);
+    }
+
     private function groundAndSumOperations($operations, $startDate = null, $endDate = null)
     {
         if(!$operations)
             return null;
+
+        if(!$startDate || !$endDate) {
+            [$start, $end] = $this->getDatesInterval($operations);
+            $startDate = $startDate ?? $start;
+            $endDate = $endDate ?? $end;
+        }
 
         $grouped = $this->initializeMonths($startDate, $endDate);
 
@@ -357,6 +395,12 @@ class StatistiqueController extends ApiController
             $keys[$key[$code]] = $key[$label];
         }
 
+        if(!$startDate || !$endDate) {
+            [$start, $end] = $this->getDatesInterval($operations);
+            $startDate = $startDate ?? $start;
+            $endDate = $endDate ?? $end;
+        }
+
         $months = $this->initializeMonths($startDate, $endDate);
 
         $grouped = array_combine(array_keys($months), array_map(function($month) use($keys){
@@ -372,28 +416,33 @@ class StatistiqueController extends ApiController
         return $grouped;
     }
 
+    public function getDatesInterval($operations)
+    {
+        $start = $operations[0]['dateOperation'];
+        $end = $operations[0]['dateOperation'];
+
+        foreach ($operations as $operation) {
+            if($start > $operation['dateOperation']) {
+                $start = $operation['dateOperation'];
+            }
+            if($end < $operation['dateOperation']) {
+                $end = $operation['dateOperation'];
+            }
+        }
+
+        return [$start->format('Y-m'), $end->format('Y-m')];
+    }
+
     public function initializeMonths(string $begin = null, string $end = null)
     {
-        if(!$begin) {
-            $begin = new \DateTime('-6 months');
-        } else {
-            $begin = \DateTime::createFromFormat('Y-m', $begin);
-        }
-        if(!$end) {
-            $end = new \DateTime();
-        } else {
-            $begin = \DateTime::createFromFormat('Y-m', $end);
-        }
+        $begin = new \DateTime($begin ?? '-6 months');
+        $end = new \DateTime($end);
 
         $array = [];
 
         for($i = $begin; $i <= $end; $i->modify('+1 month')){
             $array[$i->format("Y-m")] = 0;
         }
-        // for($i = 1; $i <= 12; $i++) {
-        //     $key = $begin->format('Y') . '-' . ($i > 9 ? $i : ('0' . $i));
-        //     $array[$key] = 0;
-        // }
 
         return $array;
     }
