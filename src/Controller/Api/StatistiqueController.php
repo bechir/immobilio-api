@@ -203,17 +203,22 @@ class StatistiqueController extends ApiController
      * La somme des dépenses réalisées sur une période (année) pour une nature de dépenses.
      * Retourne les résultats des 12 derniers mois si les dates sont nulles.
      *
-     * @param int           natureId: Identifiant de la nature de dépense
+     * @param string         natureId: Identifiant de la nature de dépense
      * @param string|null   dateDebut: Date de début
      * @param string|null   dateFin: date de fin
      *
      * @Route("/operation-caisse/depense/etat/nature-depense/{natureId}/{dateDebut}/{dateFin}")
      */
-    public function getEtatDepensesPourUneNatureDepense(int $natureId, string $dateDebut = null, string $dateFin = null)
+    public function getEtatDepensesPourUneNatureDepense(string $natureId, string $dateDebut = null, string $dateFin = null)
     {
         $operations = $this->operationRepository->getEtatDepensesPourUneNatureDepense($natureId, $dateDebut, $dateFin);
 
-        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
+        $grouped = $this->initializeMonths();
+        foreach ($operations as $operation) {
+            $grouped[$operation['datetime']] = intval($operation['total']);
+        }
+
+        return $this->json($grouped);
     }
 
     /**
@@ -225,13 +230,17 @@ class StatistiqueController extends ApiController
      *
      * @Route("/operation-caisse/depense/etat/nature-depense/{dateDebut}/{dateFin}")
      */
-    public function getEtatDepensesParNatureDepense(CptNatureOperationCaisseRepository $natureRepository, string $dateDebut = null, string $dateFin = null)
+    public function getEtatDepensesParNatureDepense(string $dateDebut = null, string $dateFin = null)
     {
         $list = $this->operationRepository->getEtatDepensesParNatureDepense($dateDebut, $dateFin);
 
-        return $this->json(
-            $this->totalizeByMonth($list, $natureRepository, 'nature', 'id', 'label')
-        );
+        $grouped = $this->initializeMonths($dateDebut, $dateFin, []);
+        
+        foreach ($list as $operation) {
+            $grouped[$operation['datetime']][] = $operation;
+        }
+
+        return $this->json($grouped);
     }
 
     /**
@@ -244,26 +253,17 @@ class StatistiqueController extends ApiController
      *
      * @Route("/operation-caisse/depense/etat/nature-depense-par-agence/{agenceId}/{dateDebut}/{dateFin}")
      */
-    public function getEtatDepensesParNatureDepenseParAgence(CptNatureOperationCaisseRepository $natureRepository, int $agenceId, string $dateDebut = null, string $dateFin = null)
+    public function getEtatDepensesParNatureDepenseParAgence(int $agenceId, string $dateDebut = null, string $dateFin = null)
     {
         $list = $this->operationRepository->getEtatDepensesParNatureDepense($agenceId, $dateDebut, $dateFin);
 
-        $data = [];
-
-        foreach ($natureRepository->findAll() as $nature) {
-            $data[$nature->getLabel()] = 0;
-        }
+        $grouped = $this->initializeMonths($dateDebut, $dateFin, []);
 
         foreach ($list as $operation) {
-            $key = $operation['nature']['label'];
-            if(array_key_exists($key, $data)) {
-                $data[$key] += $operation['montant'];
-            } else {
-                $data[$key] = $operation['montant'];
-            }
+            $grouped[$operation['datetime']][] = $operation;
         }
 
-        return $this->json($data);
+        return $this->json($grouped);
     }
 
     /**
@@ -416,24 +416,26 @@ class StatistiqueController extends ApiController
         return $grouped;
     }
 
-    public function getDatesInterval($operations)
+    public function getDatesInterval($operations, $key = 'dateOperation', $isDateObject = true)
     {
-        $start = $operations[0]['dateOperation'];
-        $end = $operations[0]['dateOperation'];
+        $start = $operations[0][$key];
+        $end = $operations[0][$key];
 
         foreach ($operations as $operation) {
-            if($start > $operation['dateOperation']) {
-                $start = $operation['dateOperation'];
+            if($start > $operation[$key]) {
+                $start = $operation[$key];
             }
-            if($end < $operation['dateOperation']) {
-                $end = $operation['dateOperation'];
+            if($end < $operation[$key]) {
+                $end = $operation[$key];
             }
         }
 
-        return [$start->format('Y-m'), $end->format('Y-m')];
+        return $isDateObject
+            ? [$start->format('Y-m'), $end->format('Y-m')]
+            : [$start, $end];
     }
 
-    public function initializeMonths(string $begin = null, string $end = null)
+    public function initializeMonths(string $begin = null, string $end = null, $withValue = 0)
     {
         $begin = new \DateTime($begin ?? '-6 months');
         $end = new \DateTime($end);
@@ -441,7 +443,7 @@ class StatistiqueController extends ApiController
         $array = [];
 
         for($i = $begin; $i <= $end; $i->modify('+1 month')){
-            $array[$i->format("Y-m")] = 0;
+            $array[$i->format("Y-m")] = $withValue;
         }
 
         return $array;

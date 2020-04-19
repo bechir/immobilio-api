@@ -140,27 +140,26 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
         );
     }
 
-    public function getEtatDepensesPourUneNatureDepense(int $natureId, string $dateDebut = null, string $dateFin = null)
+    public function getEtatDepensesPourUneNatureDepense(string $natureId, string $dateDebut = null, string $dateFin = null)
     {
         return $this->getAssocResults(
             $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->leftJoin('o.nature', 'n')
-                    ->addSelect('n')
-                ->leftJoin('o.typeOperationCaisse', 't')
-                    ->addSelect('t')
-                ->andWhere('n.id = :nature')
+                ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+                ->leftJoin('o.centreDepense', 'c')->addSelect('c')
+                ->select('SUBSTRING(o.dateOperation, 1, 7) as datetime')
+                ->addSelect('SUM(o.montant) as total')
+                ->andWhere('c.code = :code')
                 ->andWhere('t.id = 8')
-                ->setParameter('nature', $natureId)
+                ->groupBy('o.dateOperation')
+                ->setParameter('code', $natureId)
         );
     }
 
     public function getEtatDepensesParNatureDepense($agenceId = null, string $dateDebut = null, string $dateFin = null)
     {
         $qb =  $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->leftJoin('o.nature', 'n')
-                    ->addSelect('n')
-                ->leftJoin('o.typeOperationCaisse', 't')
-                    ->addSelect('t')
+                ->leftJoin('o.centreDepense', 'c')->addSelect('c')
+                ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
                 ->andWhere('t.id = 8');
         if($agenceId != null) {
             $qb->leftJoin('o.agence', 'a')
@@ -168,6 +167,12 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->andWhere('a.id = :id')
             ->setParameter('id', $agenceId);
         }
+
+        $qb->select('SUBSTRING(o.dateOperation, 1, 7) as datetime')
+            ->addSelect('SUM(o.montant) as total')
+            ->addSelect('c.libelle as label')
+            ->addSelect('c.code')
+            ->groupBy('o.dateOperation');
 
         return $this->getAssocResults($qb);
     }
@@ -234,7 +239,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
                 ->leftJoin(CmlTypeClient::class, 'typeClient', Join::WITH, 'typeClient.id = c.typeClient')
                 ->select('typeClient.libelle as label')
                 ->addSelect('SUM(o.montant) as total')
-                ->andWhere('t.id = 7')
+                ->andWhere('t.id IN (6, 7)')
                 ->groupBy('typeClient')
                 ->getQuery()->getResult(PDO::FETCH_ASSOC)
         ;
