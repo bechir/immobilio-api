@@ -152,34 +152,20 @@ class StatistiqueController extends ApiController
      *
      * @Route("/operation-caisse/depense/etat/agence-filtre-par-sci/{agenceId}/{dateDebut}/{dateFin}")
      */
-    public function getEtatDepensesAgenceParSci(PatSciRepository $sciRepository, int $agenceId, string $dateDebut = null, string $dateFin = null)
+    public function getEtatDepensesAgenceParSci(int $agenceId, string $dateDebut = null, string $dateFin = null)
     {
-        $operations = $this->operationRepository->getEtatDepensesAgence($agenceId, $dateDebut, $dateFin, false);
+        $operations = $this->operationRepository->getEtatDepensesAgenceParSci($agenceId, $dateDebut, $dateFin, false);
 
         if(!$operations)
             return $this->json(null);
+        
+        $grouped = $this->initializeMonths($dateDebut, $dateFin, []);
 
-        $scisAgence = $sciRepository->findBy(['codeAgence' => $operations[0]->getCodeAgence()]);
-
-        $grouped = [];
-
-        foreach ($scisAgence as $sci) {
-            $grouped[$sci->getLibelle()] = $this->initializeMonths($dateDebut, $dateFin);
-
-            foreach ($operations as $operation) {
-                if($operation->getSci() && $operation->getSci()->getId() == $sci->getId()) {
-                    foreach (array_keys($grouped[$sci->getLibelle()]) as $date) {
-                        if($date == $operation->getDateOperation()->format('Y-m')) {
-                            $grouped[$sci->getLibelle()][$date] += $operation->getMontant();
-                        }
-                    }
-                }
-            }
+        foreach ($operations as $operation) {
+            $grouped[$operation['datetime']][$operation['label']] = $operation['total'];
         }
-
+        
         return $this->json($grouped);
-
-        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
     }
 
     /**
@@ -237,7 +223,8 @@ class StatistiqueController extends ApiController
         $grouped = $this->initializeMonths($dateDebut, $dateFin, []);
         
         foreach ($list as $operation) {
-            $grouped[$operation['datetime']][] = $operation;
+            $key = $operation['datetime'];
+            $grouped[$key][$operation['label']] = (int)$operation['total'];
         }
 
         return $this->json($grouped);

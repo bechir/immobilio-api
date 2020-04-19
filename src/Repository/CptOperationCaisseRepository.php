@@ -7,7 +7,6 @@
 namespace App\Repository;
 
 use App\Entity\AppAgence;
-use App\Entity\CmlClient;
 use App\Entity\CmlFacture;
 use App\Entity\CmlFactureEspace;
 use App\Entity\CmlTypeClient;
@@ -111,6 +110,26 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->setParameter('agence', $agenceId);
 
         return $assoc ? $this->getAssocResults($qb) : $qb->getQuery()->getResult();
+    }
+
+    public function getEtatDepensesAgenceParSci(int $agenceId, string $dateDebut = null, string $dateFin = null)
+    {
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
+            ->leftJoin('o.agence', 'a')
+                ->addSelect('a')
+            ->leftJoin('o.typeOperationCaisse', 't')
+                ->addSelect('t')
+            ->leftJoin(PatSci::class, 'pat', Join::WITH, 'pat.codeAgence = o.codeAgence')
+            ->select('SUBSTRING(o.dateOperation, 1, 7) as datetime')
+            ->addSelect('SUM(o.montant) as total')
+            ->addSelect('pat.libelle as label')
+            ->addSelect('o.codeAgence')
+            ->groupBy('datetime')
+            ->addGroupBy('pat.id')
+            ->andWhere('a.id = :agence')
+            ->andWhere('t.id = 8')
+            ->setParameter('agence', $agenceId)
+            ->getQuery()->getResult();
     }
 
     public function getEtatDepensesSci(int $sciId, string $dateDebut = null, string $dateFin = null)
@@ -226,7 +245,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
                 ->groupBy('o.codeAgence')
                 ->select('a.nom as name')
                 ->addSelect('SUM(o.montant) as total')
-                ->andWhere('t.id = 7')
+                ->andWhere('t.id IN (6, 7)')
                 ->getQuery()->getResult()
         ;
     }
