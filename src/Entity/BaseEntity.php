@@ -35,6 +35,24 @@ class BaseEntity
      */
     private $updatedBy;
 
+    /**
+     * @var bool
+     * @ORM\Column(name="enabled",type="boolean", nullable=true)
+     */
+    private $enabled;
+
+    /**
+     * @var bool
+     * @ORM\Column(name="deleted",type="boolean", nullable=true)
+     */
+    private $deleted;
+
+    /**
+     * @var bool
+     * @ORM\Column(name="archived",type="boolean", nullable=true)
+     */
+    private $archived;
+
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
