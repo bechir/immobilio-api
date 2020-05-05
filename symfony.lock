@@ -24,10 +24,10 @@
         "version": "2.12.0"
     },
     "doctrine/data-fixtures": {
-        "version": "1.4.2"
+        "version": "1.3.3"
     },
     "doctrine/dbal": {
-        "version": "v2.10.1"
+        "version": "v2.9.3"
     },
     "doctrine/doctrine-bundle": {
         "version": "2.0",
@@ -79,7 +79,7 @@
         "version": "1.3.0"
     },
     "doctrine/lexer": {
-        "version": "1.2.0"
+        "version": "1.0.2"
     },
     "doctrine/migrations": {
         "version": "2.2.1"
@@ -93,61 +93,25 @@
     "doctrine/reflection": {
         "version": "1.2.1"
     },
-    "hoa/compiler": {
-        "version": "3.17.08.08"
-    },
-    "hoa/consistency": {
-        "version": "1.17.05.02"
-    },
-    "hoa/event": {
-        "version": "1.17.01.13"
-    },
-    "hoa/exception": {
-        "version": "1.17.01.16"
-    },
-    "hoa/file": {
-        "version": "1.17.07.11"
-    },
-    "hoa/iterator": {
-        "version": "2.17.01.10"
-    },
-    "hoa/math": {
-        "version": "1.17.05.16"
-    },
-    "hoa/protocol": {
-        "version": "1.17.01.14"
-    },
-    "hoa/regex": {
-        "version": "1.17.01.13"
-    },
-    "hoa/stream": {
-        "version": "1.17.02.21"
-    },
-    "hoa/ustring": {
-        "version": "4.17.01.16"
-    },
-    "hoa/visitor": {
-        "version": "2.17.01.16"
-    },
-    "hoa/zformat": {
-        "version": "1.17.01.10"
-    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
     "jms/metadata": {
-        "version": "2.1.0"
+        "version": "1.7.0"
+    },
+    "jms/parser-lib": {
+        "version": "1.0.0"
     },
     "jms/serializer": {
-        "version": "3.6.0"
+        "version": "1.14.1"
     },
     "jms/serializer-bundle": {
-        "version": "3.0",
+        "version": "2.0",
         "recipe": {
             "repo": "github.com/symfony/recipes-contrib",
             "branch": "master",
-            "version": "3.0",
-            "ref": "384cec52df45f3bfd46a09930d6960a58872b268"
+            "version": "2.0",
+            "ref": "fe60ce509ef04a3f40da96e3979bc8d9b13b2372"
         },
         "files": [
             "config/packages/dev/jms_serializer.yaml",
@@ -188,14 +152,17 @@
     "nikic/php-parser": {
         "version": "v4.4.0"
     },
-    "ocramius/package-versions": {
-        "version": "1.4.2"
-    },
     "ocramius/proxy-manager": {
-        "version": "2.2.3"
+        "version": "2.1.1"
     },
     "php": {
-        "version": "7.2"
+        "version": "7.1.3"
+    },
+    "phpcollection/phpcollection": {
+        "version": "0.5.0"
+    },
+    "phpoption/phpoption": {
+        "version": "1.7.3"
     },
     "psr/cache": {
         "version": "1.0.1"
@@ -219,13 +186,13 @@
         ]
     },
     "symfony/cache": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/cache-contracts": {
-        "version": "v2.0.1"
+        "version": "v1.1.7"
     },
     "symfony/config": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/console": {
         "version": "4.4",
@@ -241,31 +208,31 @@
         ]
     },
     "symfony/debug": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/dependency-injection": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/doctrine-bridge": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/dotenv": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/error-handler": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/event-dispatcher": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/event-dispatcher-contracts": {
         "version": "v1.1.7"
     },
     "symfony/filesystem": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/finder": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/flex": {
         "version": "1.0",
@@ -285,7 +252,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "4.4",
-            "ref": "23ecaccc551fe2f74baf613811ae529eb07762fa"
+            "ref": "36d3075b2b8e0c4de0e82356a86e4c4a4eb6681b"
         },
         "files": [
             "config/bootstrap.php",
@@ -300,13 +267,13 @@
         ]
     },
     "symfony/http-foundation": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/http-kernel": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/inflector": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/maker-bundle": {
         "version": "1.0",
@@ -318,7 +285,7 @@
         }
     },
     "symfony/mime": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/orm-pack": {
         "version": "v1.0.8"
@@ -336,7 +303,7 @@
         "version": "v1.15.0"
     },
     "symfony/property-access": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/routing": {
         "version": "4.2",
@@ -365,25 +332,25 @@
         ]
     },
     "symfony/security-core": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/security-csrf": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/security-guard": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/security-http": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/service-contracts": {
-        "version": "v2.0.1"
+        "version": "v1.1.8"
     },
     "symfony/stopwatch": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/translation-contracts": {
-        "version": "v2.0.1"
+        "version": "v1.1.7"
     },
     "symfony/validator": {
         "version": "4.3",
@@ -399,13 +366,13 @@
         ]
     },
     "symfony/var-dumper": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/var-exporter": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "symfony/yaml": {
-        "version": "v4.4.7"
+        "version": "v4.4.8"
     },
     "zendframework/zend-code": {
         "version": "3.4.1"

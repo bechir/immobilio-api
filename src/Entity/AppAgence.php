@@ -42,9 +42,6 @@ class AppAgence extends BaseEntity
      * @var string
      *
      * @ORM\Column(name="nom", type="string", length=255, nullable=false)
-     * 
-     * @Groups({"list", "details"})
-     * @SerializedName("name")
      */
     private $nom;
 
@@ -100,10 +97,20 @@ class AppAgence extends BaseEntity
 
     /**
      * @VirtualProperty
+     * @Groups({"list", "details"})
+     * @SerializedName("name")
+     */
+    public function name()
+    {
+        return $this->nom;
+    }
+
+    /**
+     * @VirtualProperty
      * @SerializedName("ville")
      * @Groups({"list", "details"})
      */
-    public function apiVille()
+    public function city()
     {
         return $this->ville ? [
             'id'    => $this->ville->getId(),

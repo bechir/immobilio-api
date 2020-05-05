@@ -8,9 +8,7 @@ namespace App\Controller\Api;
 
 use App\Entity\CptOperationCaisse;
 use App\Repository\CptMoyenPaiementRepository;
-use App\Repository\CptNatureOperationCaisseRepository;
 use App\Repository\CptOperationCaisseRepository;
-use App\Repository\PatSciRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -50,7 +48,7 @@ class StatistiqueController extends ApiController
     {
         $operations = $this->operationRepository->getEtatPaiementsFactureAgence($agenceId, $dateDebut, $dateFin);
 
-        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
+        return $this->json($this->replaceKeys($operations));
     }
 
     /**
@@ -139,7 +137,7 @@ class StatistiqueController extends ApiController
     {
         $operations = $this->operationRepository->getEtatDepensesAgence($agenceId, $dateDebut, $dateFin);
 
-        return $this->json($this->groundAndSumOperations($operations, $dateDebut, $dateFin));
+        return $this->json($this->replaceKeys($operations));
     }
 
     /**
@@ -200,6 +198,7 @@ class StatistiqueController extends ApiController
         $operations = $this->operationRepository->getEtatDepensesPourUneNatureDepense($natureId, $dateDebut, $dateFin);
 
         $grouped = $this->initializeMonths();
+
         foreach ($operations as $operation) {
             $grouped[$operation['datetime']] = intval($operation['total']);
         }
@@ -223,7 +222,7 @@ class StatistiqueController extends ApiController
         $grouped = $this->initializeMonths($dateDebut, $dateFin, []);
         
         foreach ($list as $operation) {
-            $key = $operation['datetime'];
+            $key = $operation['month'];
             $grouped[$key][$operation['label']] = (int)$operation['total'];
         }
 
@@ -247,7 +246,8 @@ class StatistiqueController extends ApiController
         $grouped = $this->initializeMonths($dateDebut, $dateFin, []);
 
         foreach ($list as $operation) {
-            $grouped[$operation['datetime']][] = $operation;
+            $key = $operation['month'];
+            $grouped[$key][$operation['label']] = (int)$operation['total'];
         }
 
         return $this->json($grouped);
@@ -434,6 +434,16 @@ class StatistiqueController extends ApiController
         }
 
         return $array;
+    }
+
+    public function replaceKeys($array, string $key = 'month', string $value = 'total')
+    {
+        $result = [];
+        foreach($array as $operation) {
+            $result[$operation[$key]] = intval($operation[$value]);
+        }
+
+        return $result;
     }
 
     /**

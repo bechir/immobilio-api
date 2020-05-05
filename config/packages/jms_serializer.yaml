@@ -1,15 +1,15 @@
 jms_serializer:
     visitors:
-        json_serialization:
+        json:
             options:
                 # - JSON_PRETTY_PRINT
                 - JSON_UNESCAPED_SLASHES
                 - JSON_PRESERVE_ZERO_FRACTION
-        json_deserialization:
-            options:
-                # - JSON_PRETTY_PRINT
-                - JSON_UNESCAPED_SLASHES
-                - JSON_PRESERVE_ZERO_FRACTION
+        # json_deserialization:
+        #     options:
+        #         # - JSON_PRETTY_PRINT
+        #         - JSON_UNESCAPED_SLASHES
+        #         - JSON_PRESERVE_ZERO_FRACTION
 
     property_naming:
         id: 'jms_serializer.identical_property_naming_strategy'

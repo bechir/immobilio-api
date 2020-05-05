@@ -33,7 +33,7 @@ class AppAgenceRepository extends ServiceEntityRepository
     public function buildPeriodQuery(string $start = null, string $end = null)
     {
         if (!$start) {
-            $start = (new \DateTime('-12 months'))->format('Y-m-d');
+            $start = (new \DateTime('-5 years'))->format('Y-m-d');
         }
         if (!$end) {
             $end = (new \DateTime())->format('Y-m-d');

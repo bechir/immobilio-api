@@ -50,6 +50,9 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
                     ->addSelect('t')
                 ->andWhere('a.id = :agence')
                 ->andWhere('t.id = 6')
+                ->select('SUBSTRING(o.dateOperation, 1, 7) as month')
+                ->addSelect('SUM(o.montant) as total')
+                ->groupBy('month')
                 ->setParameter('agence', $agenceId)
         );
     }
@@ -98,18 +101,20 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
         );
     }
 
-    public function getEtatDepensesAgence(int $agenceId, string $dateDebut = null, string $dateFin = null, $assoc = true)
+    public function getEtatDepensesAgence(int $agenceId, string $dateDebut = null, string $dateFin = null)
     {
-        $qb = $this->buildPeriodQuery($dateDebut, $dateFin)
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
             ->leftJoin('o.agence', 'a')
                 ->addSelect('a')
-            ->leftJoin('o.typeOperationCaisse', 't')
+            ->join('o.typeOperationCaisse', 't')
                 ->addSelect('t')
+            ->select('SUBSTRING(o.dateOperation, 1, 7) as month')
+            ->addSelect('SUM(o.montant) as total')
+            ->groupBy('month')
             ->andWhere('a.id = :agence')
             ->andWhere('t.id = 8')
-            ->setParameter('agence', $agenceId);
-
-        return $assoc ? $this->getAssocResults($qb) : $qb->getQuery()->getResult();
+            ->setParameter('agence', $agenceId)
+            ->getQuery()->getResult();
     }
 
     public function getEtatDepensesAgenceParSci(int $agenceId, string $dateDebut = null, string $dateFin = null)
@@ -187,7 +192,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->setParameter('id', $agenceId);
         }
 
-        $qb->select('SUBSTRING(o.dateOperation, 1, 7) as datetime')
+        $qb->select('SUBSTRING(o.dateOperation, 1, 7) as month')
             ->addSelect('SUM(o.montant) as total')
             ->addSelect('c.libelle as label')
             ->addSelect('c.code')

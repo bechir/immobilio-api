@@ -1,0 +1,12 @@
+RewriteEngine On
+
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+
+RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
+RewriteRule ^ %1 [L,NE,R=302]
+
+RewriteRule !\.(js|gif|JPG|JPEG|PNG|jpg|png|css|txt|svg|woff|woff2|ttf|map|ico|pdf|doc|docx|odt|ppt|pptx)$ public/index.php [L]
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ public/$1 [L]
+
