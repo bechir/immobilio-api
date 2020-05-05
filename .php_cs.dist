@@ -1,7 +1,8 @@
 <?php
 
 $header = <<<COMMENT
-This file is part of the Immobilio API application.
+This file is part of the Immobilio API.
+(c) KuTiWa, Inc.
 COMMENT;
 
 $finder = PhpCsFixer\Finder::create()

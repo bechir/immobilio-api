@@ -1,7 +1,8 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App\Entity;
@@ -14,7 +15,13 @@ use JMS\Serializer\Annotation\VirtualProperty;
 /**
  * CmlFacture.
  *
- * @ORM\Table(name="cml_facture", indexes={@ORM\Index(name="IDX_D313E6A1896DBBDE", columns={"updated_by_id"}), @ORM\Index(name="IDX_D313E6A11823061F", columns={"contrat_id"}), @ORM\Index(name="IDX_D313E6A1B03A8386", columns={"created_by_id"}), @ORM\Index(name="IDX_D313E6A16BF700BD", columns={"status_id"}), @ORM\Index(name="IDX_D313E6A119EB6921", columns={"client_id"})})
+ * @ORM\Table(name="cml_facture", indexes={
+ *      @ORM\Index(name="IDX_D313E6A1896DBBDE", columns={"updated_by_id"}),
+ *      @ORM\Index(name="IDX_D313E6A11823061F", columns={"contrat_id"}),
+ *      @ORM\Index(name="IDX_D313E6A1B03A8386", columns={"created_by_id"}),
+ *      @ORM\Index(name="IDX_D313E6A16BF700BD", columns={"status_id"}),
+ *      @ORM\Index(name="IDX_D313E6A119EB6921", columns={"client_id"})}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\CmlFactureRepository")
  */
 class CmlFacture extends BaseEntity

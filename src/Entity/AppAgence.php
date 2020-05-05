@@ -1,15 +1,16 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\VirtualProperty;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation\VirtualProperty;
 
 /**
  * AppAgence.
@@ -25,7 +26,7 @@ class AppAgence extends BaseEntity
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * 
+     *
      * @Groups({"list", "details"})
      */
     private $id;
@@ -49,7 +50,7 @@ class AppAgence extends BaseEntity
      * @var string
      *
      * @ORM\Column(name="code", type="string", length=10, nullable=false, options={"default"="DLA01"})
-     * 
+     *
      * @Groups({"list", "details"})
      */
     private $code = 'DLA01';
@@ -113,9 +114,9 @@ class AppAgence extends BaseEntity
     public function city()
     {
         return $this->ville ? [
-            'id'    => $this->ville->getId(),
-            'code'  => $this->ville->getCode(),
-            'name'  => $this->ville->getNom()
+            'id' => $this->ville->getId(),
+            'code' => $this->ville->getCode(),
+            'name' => $this->ville->getNom(),
         ] : '';
     }
 }

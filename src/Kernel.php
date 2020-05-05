@@ -1,7 +1,8 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App;

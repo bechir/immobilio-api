@@ -1,18 +1,19 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\CmlFacture;
 use App\Entity\CmlFactureEspace;
 use App\Entity\PatEspace;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method PatEspace|null find($id, $lockMode = null, $lockVersion = null)
@@ -26,6 +27,7 @@ class PatEspaceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, PatEspace::class);
     }
+
     public function getTauxOccupationByAgenceByNatureEspace(string $codeAgence, string $dateDebut = null, string $dateFin = null)
     {
         return $this->buildPeriodQuery($dateDebut, $dateFin)
@@ -45,7 +47,6 @@ class PatEspaceRepository extends ServiceEntityRepository
                 ->setParameter('codeAgence', $codeAgence)
         );
     }
-
 
     public function buildPeriodQuery(string $start = null, string $end = null)
     {

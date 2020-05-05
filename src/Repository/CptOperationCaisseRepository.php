@@ -1,7 +1,8 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App\Repository;
@@ -10,15 +11,14 @@ use App\Entity\AppAgence;
 use App\Entity\CmlFacture;
 use App\Entity\CmlFactureEspace;
 use App\Entity\CmlTypeClient;
-use App\Entity\CptCentreDepense;
 use App\Entity\CptOperationCaisse;
 use App\Entity\PatBienImmobilier;
 use App\Entity\PatEspace;
 use App\Entity\PatSci;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\Expr\Join;
 use PDO;
 
 /**
@@ -182,11 +182,11 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
 
     public function getEtatDepensesParNatureDepense($agenceId = null, string $dateDebut = null, string $dateFin = null)
     {
-        $qb =  $this->buildPeriodQuery($dateDebut, $dateFin)
+        $qb = $this->buildPeriodQuery($dateDebut, $dateFin)
                 ->leftJoin('o.centreDepense', 'c')->addSelect('c')
                 ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
                 ->andWhere('t.id = 8');
-        if($agenceId != null) {
+        if (null != $agenceId) {
             $qb->leftJoin('o.agence', 'a')
                 ->addSelect('a')
             ->andWhere('a.id = :id')
@@ -333,21 +333,21 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
             ->leftJoin('o.agence', 'a')->addSelect('a')
             ->leftJoin('o.bienImmobilier', 'b')->addSelect('b')
-            
+
             ->select('a.nom as nom_agence')
             ->addSelect('SUM(o.montant) as montant_total')
             ->addSelect('SUBSTRING(o.dateOperation, 6, 2) as mois')
-            
+
             ->where('SUBSTRING(o.dateOperation, 1, 4) = :annee')
             ->andWhere('o.operationAnnule is NULL')
             ->andWhere('status.id = 1')
             ->andWhere('a.id = :id')
             ->andWhere('t.id = :type')
-            
+
             ->setParameter('id', $agenceId)
             ->setParameter('type', $typeOperationCaisseId)
             ->setParameter('annee', $annee)
-            
+
             ->groupBy('nom_agence')
             ->addGroupBy('mois')
         ->getQuery()->getResult();

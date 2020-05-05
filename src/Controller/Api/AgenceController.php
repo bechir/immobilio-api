@@ -1,7 +1,8 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App\Controller\Api;
@@ -9,8 +10,8 @@ namespace App\Controller\Api;
 use App\Entity\AppAgence;
 use App\Repository\AppAgenceRepository;
 use JMS\Serializer\SerializationContext;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
  * @Route("/agences")
@@ -36,7 +37,7 @@ class AgenceController extends ApiController
     }
 
     /**
-     * Details d'une agence
+     * Details d'une agence.
      *
      * @param int id: L'identifiant de l'agence
      *

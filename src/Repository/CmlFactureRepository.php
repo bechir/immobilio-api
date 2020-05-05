@@ -1,7 +1,8 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App\Repository;
@@ -10,7 +11,6 @@ use App\Entity\AppAgence;
 use App\Entity\CmlFacture;
 use App\Entity\CmlFactureEspace;
 use App\Entity\CptOperationCaisse;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
@@ -43,10 +43,10 @@ class CmlFactureRepository extends ServiceEntityRepository
 
         $qb = $this->getBaseFactureQueryBuilder($date);
 
-        if($type === 'client') {
+        if ('client' === $type) {
             $qb->andWhere('c.id = :id')
             ->setParameter('id', $id);
-        } elseif($type === 'agence') {
+        } elseif ('agence' === $type) {
             $qb->andWhere('f.codeAgence = :code')
             ->setParameter('code', $id);
         }

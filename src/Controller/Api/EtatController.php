@@ -1,15 +1,16 @@
 <?php
 
 /*
- * This file is part of the Immobilio API application.
+ * This file is part of the Immobilio API.
+ * (c) KuTiWa, Inc.
  */
 
 namespace App\Controller\Api;
 
 use App\Repository\CmlFactureRepository;
 use App\Repository\CptOperationCaisseRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
  * @Route("/etat")
@@ -19,11 +20,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class EtatController extends ApiController
 {
     /**
-     * LISTE DES PAIEMENTS DE FACTURES QUI ONT ETE ANNULEES
-     * 
+     * LISTE DES PAIEMENTS DE FACTURES QUI ONT ETE ANNULEES.
+     *
      * @param string|null date: Date à partir de laquelle chercher
-     * 
-     * @Route("/paiement-factures/annulees/{dateFacture}")
+     *
+     * @Route("/factures-annulees/{dateFacture}")
      */
     public function getPaiementFacturesAnnulees(CmlFactureRepository $cmlFactureRepository, ?string $dateFacture = null)
     {
@@ -37,8 +38,8 @@ class EtatController extends ApiController
      *
      * @param string codeAgence: Le code de l'agence
      * @param string|null date: Date à partir de laquelle chercher
-     * 
-     * @Route("/paiement-factures/arriere-client/agence/{codeAgence}/{dateFacture}")
+     *
+     * @Route("/arriere-client/agence/{codeAgence}/{dateFacture}")
      */
     public function getArriereClientParFactureAgence(CmlFactureRepository $cmlFactureRepository, string $codeAgence, ?string $dateFacture = null)
     {
@@ -52,8 +53,8 @@ class EtatController extends ApiController
      *
      * @param string idClient: L'id du client
      * @param string|null date: Date à partir de laquelle chercher
-     * 
-     * @Route("/paiement-factures/arriere-client/{idClient}/{dateFacture}")
+     *
+     * @Route("/arriere-client/{idClient}/{dateFacture}")
      */
     public function getArriereClientParFacture(CmlFactureRepository $cmlFactureRepository, string $idClient, ?string $dateFacture = null)
     {
@@ -63,12 +64,12 @@ class EtatController extends ApiController
     }
 
     /**
-     * DECAISSEMENT DANS LES AGENCES SUR UNE PERIODE
+     * DECAISSEMENT DANS LES AGENCES SUR UNE PERIODE.
      *
      * @param string dateDebut: Date de debut
      * @param string dateFin: Date de fin
-     * 
-     * @Route("/paiement-factures/decaissement/par-nature/{dateDebut}/{dateFin}")
+     *
+     * @Route("/decaissement/par-nature/{dateDebut}/{dateFin}")
      */
     public function getDecaissementParNatureePeriode(CptOperationCaisseRepository $cptOperationCaisseRepository, string $dateDebut, string $dateFin)
     {
@@ -78,13 +79,13 @@ class EtatController extends ApiController
     }
 
     /**
-     * DECAISSEMENT PAR NATURE DANS UNE AGENCE (exemple DOUALA) SUR UNE PERIODE
+     * DECAISSEMENT PAR NATURE DANS UNE AGENCE (exemple DOUALA) SUR UNE PERIODE.
      *
-     * @param integer agenceId: Id de l'agence
+     * @param int agenceId: Id de l'agence
      * @param string dateDebut: Date de debut
      * @param string dateFin: Date de fin
-     * 
-     * @Route("/paiement-factures/decaissement/par-nature/agence/{agenceId}/{dateDebut}/{dateFin}")
+     *
+     * @Route("/decaissement/par-nature/agence/{agenceId}/{dateDebut}/{dateFin}")
      */
     public function getDecaissementParNatureAgencePeriode(CptOperationCaisseRepository $cptOperationCaisseRepository, int $agenceId, string $dateDebut, string $dateFin)
     {
@@ -94,13 +95,13 @@ class EtatController extends ApiController
     }
 
     /**
-     * DECAISSEMENT SUR LES IMMEUBLES D'UNE AGENCE (exemple agence_id = 1) SUR UNE PERIODE
+     * DECAISSEMENT SUR LES IMMEUBLES D'UNE AGENCE (exemple agence_id = 1) SUR UNE PERIODE.
      *
-     * @param integer agenceId: Id de l'agence
+     * @param int agenceId: Id de l'agence
      * @param string dateDebut: Date de debut
      * @param string dateFin: Date de fin
-     * 
-     * @Route("/paiement-factures/decaissement/par-immeuble/agence/{agenceId}/{dateDebut}/{dateFin}")
+     *
+     * @Route("/decaissement/par-immeuble/agence/{agenceId}/{dateDebut}/{dateFin}")
      */
     public function getDecaissementParImmeubleAgencePeriode(CptOperationCaisseRepository $cptOperationCaisseRepository, int $agenceId, string $dateDebut, string $dateFin)
     {
@@ -110,12 +111,12 @@ class EtatController extends ApiController
     }
 
     /**
-     * ENCAISSEMENT DANS LES AGENCES SUR UNE PERIODE
+     * ENCAISSEMENT DANS LES AGENCES SUR UNE PERIODE.
      *
      * @param string dateDebut: Date de debut
      * @param string dateFin: Date de fin
-     * 
-     * @Route("/paiement-factures/encaissement/par-nature/{dateDebut}/{dateFin}")
+     *
+     * @Route("/encaissement/par-nature/{dateDebut}/{dateFin}")
      */
     public function getEncaissementParNatureePeriode(CptOperationCaisseRepository $cptOperationCaisseRepository, string $dateDebut, string $dateFin)
     {
@@ -125,13 +126,13 @@ class EtatController extends ApiController
     }
 
     /**
-     * ENCAISSEMENT PAR NATURE DANS UNE AGENCE (exemple DOUALA) SUR UNE PERIODE
+     * ENCAISSEMENT PAR NATURE DANS UNE AGENCE (exemple DOUALA) SUR UNE PERIODE.
      *
-     * @param integer agenceId: Id de l'agence
+     * @param int agenceId: Id de l'agence
      * @param string dateDebut: Date de debut
      * @param string dateFin: Date de fin
-     * 
-     * @Route("/paiement-factures/encaissement/par-nature/agence/{agenceId}/{dateDebut}/{dateFin}")
+     *
+     * @Route("/encaissement/par-nature/agence/{agenceId}/{dateDebut}/{dateFin}")
      */
     public function getEncaissementParNatureAgencePeriode(CptOperationCaisseRepository $cptOperationCaisseRepository, int $agenceId, string $dateDebut, string $dateFin)
     {
@@ -141,13 +142,13 @@ class EtatController extends ApiController
     }
 
     /**
-     * ENCAISSEMENT SUR LES IMMEUBLES D'UNE AGENCE (exemple agence_id = 1) SUR UNE PERIODE
+     * ENCAISSEMENT SUR LES IMMEUBLES D'UNE AGENCE (exemple agence_id = 1) SUR UNE PERIODE.
      *
-     * @param integer agenceId: Id de l'agence
+     * @param int agenceId: Id de l'agence
      * @param string dateDebut: Date de debut
      * @param string dateFin: Date de fin
-     * 
-     * @Route("/paiement-factures/encaissement/par-immeuble/agence/{agenceId}/{dateDebut}/{dateFin}")
+     *
+     * @Route("/encaissement/par-immeuble/agence/{agenceId}/{dateDebut}/{dateFin}")
      */
     public function getEncaissementParImmeubleAgencePeriode(CptOperationCaisseRepository $cptOperationCaisseRepository, int $agenceId, string $dateDebut, string $dateFin)
     {
@@ -157,12 +158,12 @@ class EtatController extends ApiController
     }
 
     /**
-     * ETAT DES DECAISSEMENTS PAR AGENCE (exemple agence_id = 1) SUR UNE ANNEE (exemple 2020) ET REPARTIS PAR MOIS
+     * ETAT DES DECAISSEMENTS PAR AGENCE (exemple agence_id = 1) SUR UNE ANNEE (exemple 2020) ET REPARTIS PAR MOIS.
      *
-     * @param integer agenceId: Id de l'agence
-     * @param integer annee: L'année cherchée
-     * 
-     * @Route("/paiement-factures/etat-decaissement/agence/{agenceId}/{annee}")
+     * @param int agenceId: Id de l'agence
+     * @param int annee: L'année cherchée
+     *
+     * @Route("/decaissement/agence/{agenceId}/{annee}")
      */
     public function getEtatDecaissementAgenceParMois(CptOperationCaisseRepository $cptOperationCaisseRepository, int $agenceId, int $annee)
     {
@@ -172,12 +173,12 @@ class EtatController extends ApiController
     }
 
     /**
-     * ETAT DES ENCAISSEMENTS PAR AGENCE (exemple agence_id = 1) SUR UNE ANNEE (exemple 2020) ET REPARTIS PAR MOIS
+     * ETAT DES ENCAISSEMENTS PAR AGENCE (exemple agence_id = 1) SUR UNE ANNEE (exemple 2020) ET REPARTIS PAR MOIS.
      *
-     * @param integer agenceId: Id de l'agence
-     * @param integer annee: L'année cherchée
-     * 
-     * @Route("/paiement-factures/etat-encaissement/agence/{agenceId}/{annee}")
+     * @param int agenceId: Id de l'agence
+     * @param int annee: L'année cherchée
+     *
+     * @Route("/encaissement/agence/{agenceId}/{annee}")
      */
     public function getEtatEncaissementAgenceParMois(CptOperationCaisseRepository $cptOperationCaisseRepository, int $agenceId, int $annee)
     {
