@@ -10,6 +10,7 @@ use App\Entity\AppAgence;
 use App\Entity\CmlFacture;
 use App\Entity\CmlFactureEspace;
 use App\Entity\CmlTypeClient;
+use App\Entity\CptCentreDepense;
 use App\Entity\CptOperationCaisse;
 use App\Entity\PatBienImmobilier;
 use App\Entity\PatEspace;
@@ -114,7 +115,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->andWhere('a.id = :agence')
             ->andWhere('t.id = 8')
             ->setParameter('agence', $agenceId)
-            ->getQuery()->getResult();
+        ->getQuery()->getResult();
     }
 
     public function getEtatDepensesAgenceParSci(int $agenceId, string $dateDebut = null, string $dateFin = null)
@@ -134,7 +135,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->andWhere('a.id = :agence')
             ->andWhere('t.id = 8')
             ->setParameter('agence', $agenceId)
-            ->getQuery()->getResult();
+        ->getQuery()->getResult();
     }
 
     public function getEtatDepensesSci(int $sciId, string $dateDebut = null, string $dateFin = null)
@@ -237,36 +238,33 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->setParameter('sci', $sciId)
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
-            ->getQuery()
-            ->getResult();
+        ->getQuery()->getResult();
     }
 
     public function getEncaissementParAgence(string $dateDebut = null, string $dateFin = null)
     {
         return $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->leftJoin('o.typeOperationCaisse', 't')
-                    ->addSelect('t')
-                ->leftJoin(AppAgence::class, 'a', Join::WITH, 'a.code = o.codeAgence')
-                ->groupBy('o.codeAgence')
-                ->select('a.nom as name')
-                ->addSelect('SUM(o.montant) as total')
-                ->andWhere('t.id IN (6, 7)')
-                ->getQuery()->getResult()
-        ;
+            ->leftJoin('o.typeOperationCaisse', 't')
+                ->addSelect('t')
+            ->leftJoin(AppAgence::class, 'a', Join::WITH, 'a.code = o.codeAgence')
+            ->groupBy('o.codeAgence')
+            ->select('a.nom as name')
+            ->addSelect('SUM(o.montant) as total')
+            ->andWhere('t.id IN (6, 7)')
+            ->getQuery()->getResult();
     }
 
     public function getEncaissementParTypeClient(string $dateDebut = null, string $dateFin = null)
     {
         return $this->buildPeriodQuery($dateDebut, $dateFin)
-                ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
-                ->leftJoin('o.client', 'c')->addSelect('c')
-                ->leftJoin(CmlTypeClient::class, 'typeClient', Join::WITH, 'typeClient.id = c.typeClient')
-                ->select('typeClient.libelle as label')
-                ->addSelect('SUM(o.montant) as total')
-                ->andWhere('t.id IN (6, 7)')
-                ->groupBy('typeClient')
-                ->getQuery()->getResult(PDO::FETCH_ASSOC)
-        ;
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->leftJoin('o.client', 'c')->addSelect('c')
+            ->leftJoin(CmlTypeClient::class, 'typeClient', Join::WITH, 'typeClient.id = c.typeClient')
+            ->select('typeClient.libelle as label')
+            ->addSelect('SUM(o.montant) as total')
+            ->andWhere('t.id IN (6, 7)')
+            ->groupBy('typeClient')
+        ->getQuery()->getResult(PDO::FETCH_ASSOC);
     }
 
     public function getOperationsByType(string $startDate = null, string $endDate = null)
@@ -279,9 +277,81 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->addSelect('t.label')
             ->groupBy('month')
             ->addGroupBy('o.typeOperationCaisse')
-            ->getQuery()->getResult();
+        ->getQuery()->getResult();
     }
 
+    public function getEncDecParNaturePeriode($typeOperationCaisseId, $dateDebut, $dateFin)
+    {
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->leftJoin(AppAgence::class, 'a', Join::WITH, 'a.code = o.codeAgence')
+            ->select('a.nom as nom_agence')
+            ->addSelect('SUM(o.montant) as montant_total')
+            ->andWhere('t.id = :type')
+            ->setParameter('type', $typeOperationCaisseId)
+            ->groupBy('nom_agence')
+        ->getQuery()->getResult();
+    }
+
+    public function getEncDecParNatureAgencePeriode($typeOperationCaisseId, $agenceId, $dateDebut, $dateFin)
+    {
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->innerJoin('o.centreDepense', 'centre')->addSelect('centre')
+            ->leftJoin(AppAgence::class, 'a', Join::WITH, 'a.code = o.codeAgence')
+            ->select('centre.libelle as nature_depense')
+            ->addSelect('SUM(o.montant) as montant_total')
+            ->andWhere('t.id = :type')
+            ->andWhere('a.id = :id')
+            ->setParameter('id', $agenceId)
+            ->setParameter('type', $typeOperationCaisseId)
+            ->groupBy('nature_depense')
+        ->getQuery()->getResult();
+    }
+
+    public function getEncDecParImmeubleAgencePeriode($typeOperationCaisseId, $agenceId, $dateDebut, $dateFin)
+    {
+        return $this->buildPeriodQuery($dateDebut, $dateFin)
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->leftJoin('o.agence', 'a')->addSelect('a')
+            ->leftJoin('o.bienImmobilier', 'b')
+                ->addSelect('b')
+            ->select('b.libelle as nom_immeuble')
+            ->addSelect('SUM(o.montant) as montant_total')
+            ->andWhere('a.id = :id')
+            ->andWhere('t.id = :type')
+            ->setParameter('id', $agenceId)
+            ->setParameter('type', $typeOperationCaisseId)
+            ->groupBy('nom_immeuble')
+        ->getQuery()->getResult();
+    }
+
+    public function getEncEtatDecAgenceParMois($typeOperationCaisseId, $agenceId, $annee)
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.statusOperation', 'status')->addSelect('status')
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->leftJoin('o.agence', 'a')->addSelect('a')
+            ->leftJoin('o.bienImmobilier', 'b')->addSelect('b')
+            
+            ->select('a.nom as nom_agence')
+            ->addSelect('SUM(o.montant) as montant_total')
+            ->addSelect('SUBSTRING(o.dateOperation, 6, 2) as mois')
+            
+            ->where('SUBSTRING(o.dateOperation, 1, 4) = :annee')
+            ->andWhere('o.operationAnnule is NULL')
+            ->andWhere('status.id = 1')
+            ->andWhere('a.id = :id')
+            ->andWhere('t.id = :type')
+            
+            ->setParameter('id', $agenceId)
+            ->setParameter('type', $typeOperationCaisseId)
+            ->setParameter('annee', $annee)
+            
+            ->groupBy('nom_agence')
+            ->addGroupBy('mois')
+        ->getQuery()->getResult();
+    }
 
     public function buildPeriodQuery(string $start = null, string $end = null)
     {
@@ -299,7 +369,7 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
             ->andWhere('o.operationAnnule is NULL')
             ->andWhere('status.id = 1')
             ->setParameter('startDate', $start)
-            ->setParameter('endDate', $end);
+        ->setParameter('endDate', $end);
     }
 
     public function getAssocResults(QueryBuilder $queryBuilder)

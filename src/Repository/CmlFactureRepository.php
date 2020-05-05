@@ -6,8 +6,13 @@
 
 namespace App\Repository;
 
+use App\Entity\AppAgence;
 use App\Entity\CmlFacture;
+use App\Entity\CmlFactureEspace;
+use App\Entity\CptOperationCaisse;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,6 +26,79 @@ class CmlFactureRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, CmlFacture::class);
+    }
+
+    public function getPaiementFacturesAnnulees(?string $date)
+    {
+        return $this->getBaseFactureQueryBuilder($date)
+            ->andWhere('statusOperationCaisse.id = 2')
+            ->getQuery()->getResult();
+    }
+
+    public function getArriereClientParFacture(string $type, string $id, ?string $date)
+    {
+        if (!$date) {
+            $date = date('Y-m-d');
+        }
+
+        $qb = $this->getBaseFactureQueryBuilder($date);
+
+        if($type === 'client') {
+            $qb->andWhere('c.id = :id')
+            ->setParameter('id', $id);
+        } elseif($type === 'agence') {
+            $qb->andWhere('f.codeAgence = :code')
+            ->setParameter('code', $id);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function getBaseFactureQueryBuilder(?string $date)
+    {
+        if (!$date) {
+            $date = date('Y-m-d');
+        }
+
+        return $this->createQueryBuilder('f')
+            ->leftJoin('f.client', 'c')->addSelect('c')
+            ->leftJoin('f.status', 's')->addSelect('s')
+
+            ->leftJoin(AppAgence::class, 'agence', Join::WITH, 'agence.code = f.codeAgence')
+            ->leftJoin(CmlFactureEspace::class, 'factEspace', Join::WITH, 'factEspace.facture = f')
+            ->leftJoin(CptOperationCaisse::class, 'opCaisse', Join::WITH, 'f.reference = opCaisse.numFacturePiece')
+            ->leftJoin('opCaisse.statusOperation', 'statusOperationCaisse')->addSelect('statusOperationCaisse')
+
+            ->select('c.id as id_client')
+            ->addSelect('c.emailClient email_client')
+            ->addSelect('c.telClient tel_client')
+            ->addSelect('c.raisonSociale raison_sociale')
+            ->addSelect('f.reference as reference')
+            ->addSelect('f.montantTotalNet as montant_total_net')
+            ->addSelect('SUBSTRING(f.dateFacture, 1, 10) as date_facture')
+            ->addSelect('SUBSTRING(f.dateLimite, 1, 10) as date_limite')
+            ->addSelect('s.libelle as libelle_status')
+            ->addSelect('agence.nom as nom_agence')
+            ->addSelect('SUM(opCaisse.montant) as montant_deja_paye')
+            ->addSelect('f.montantTotalNet - SUM(opCaisse.montant) as montant_restant')
+            ->addSelect('factEspace.nombreMois as nombre_mois_facture')
+
+            ->where("s.code IN ('SF001','SF002')")
+            ->andWhere('f.deleted = 0')
+            ->andWhere('f.dateFacture < :dateFacture')
+            ->setParameter('dateFacture', $date)
+
+            ->groupBy('reference')
+            ->addGroupBy('montant_total_net')
+            ->addGroupBy('date_facture')
+            ->addGroupBy('date_limite')
+            ->addGroupBy('nom_agence')
+            ->addGroupBy('libelle_status')
+            ->addGroupBy('nombre_mois_facture')
+            ->addGroupBy('id_client')
+            ->addGroupBy('raison_sociale')
+            ->addGroupBy('tel_client')
+            ->addGroupBy('email_client');
     }
 
     public function getFacturesByClient($clientId, $startDate, $endDate)
