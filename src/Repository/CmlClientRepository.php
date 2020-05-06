@@ -23,33 +23,26 @@ class CmlClientRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CmlClient::class);
     }
-
-    // /**
-    //  * @return CmlClient[] Returns an array of CmlClient objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getClients(string $startDate = null, string $endDate = null)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->buildPeriodQuery($startDate, $endDate)
+            ->getQuery()->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?CmlClient
+    public function buildPeriodQuery(string $start = null, string $end = null)
     {
+        if (!$start) {
+            $start = (new \DateTime('-5 years'))->format('Y-m-d');
+        }
+        if (!$end) {
+            $end = (new \DateTime())->format('Y-m-d');
+        }
+
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->leftJoin('c.typeClient', 't')->addSelect('t')
+            ->andWhere('c.createdAt BETWEEN :startDate AND :endDate')
+            ->andWhere('t.id = 1')
+            ->setParameter('startDate', $start)
+            ->setParameter('endDate', $end);
     }
-    */
 }

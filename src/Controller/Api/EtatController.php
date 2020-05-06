@@ -11,6 +11,7 @@ use App\Repository\CmlFactureRepository;
 use App\Repository\CptOperationCaisseRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/etat")
@@ -34,33 +35,28 @@ class EtatController extends ApiController
     }
 
     /**
-     * ARRIERES DES CLIENTS: LISTE DES FACTURES AVEC LE MONTANT DEJA PAYE ET LE RESTE A PAYER DANS UNE AGENCE.
-     *
-     * @param string codeAgence: Le code de l'agence
-     * @param string|null date: Date à partir de laquelle chercher
-     *
-     * @Route("/arriere-client/agence/{codeAgence}/{dateFacture}")
-     */
-    public function getArriereClientParFactureAgence(CmlFactureRepository $cmlFactureRepository, string $codeAgence, ?string $dateFacture = null)
-    {
-        $result = $cmlFactureRepository->getArriereClientParFacture('agence', $codeAgence, $dateFacture);
-
-        return $this->json($result);
-    }
-
-    /**
      * ARRIERES DES CLIENTS: LISTE DES FACTURES AVEC LE MONTANT DEJA PAYE ET LE RESTE A PAYER.
      *
-     * @param string idClient: L'id du client
-     * @param string|null date: Date à partir de laquelle chercher
+     * @param string|null clientId:     L'id du client
+     * @param string|null agenceCode:   Le code de l'agence
+     * @param string|null startDate:    Date de début
+     * @param string|null endDate:      Date de fin
      *
-     * @Route("/arriere-client/{idClient}/{dateFacture}")
+     * @Route("/arrierees")
      */
-    public function getArriereClientParFacture(CmlFactureRepository $cmlFactureRepository, string $idClient, ?string $dateFacture = null)
+    public function getArrieresByClientIdByAgenceCodeByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
-        $result = $cmlFactureRepository->getArriereClientParFacture('client', $idClient, $dateFacture);
+        $query = $request->query;
+        $params = [
+            'clientId'  =>  $query->get('clientId'),
+            'agenceCode'  =>  $query->get('agenceCode'),
+            'startDate' =>  $query->get('startDate'),
+            'endDate'   =>  $query->get('endDate')
+        ];
 
-        return $this->json($result);
+        return $this->json(
+            $cmlFactureRepository->getArrieresByClientIdByAgenceCodeByDate($params)
+        );
     }
 
     /**

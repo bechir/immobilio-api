@@ -11,6 +11,9 @@ use App\Entity\AppAgence;
 use App\Entity\CmlFacture;
 use App\Entity\CmlFactureEspace;
 use App\Entity\CptOperationCaisse;
+use App\Entity\PatBienImmobilier;
+use App\Entity\PatEspace;
+use App\Entity\PatSci;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
@@ -99,6 +102,54 @@ class CmlFactureRepository extends ServiceEntityRepository
             ->addGroupBy('raison_sociale')
             ->addGroupBy('tel_client')
             ->addGroupBy('email_client');
+    }
+
+    public function getArrieresByClientIdByAgenceCodeByDate(?array $params)
+    {
+        $qb = $this->createQueryBuilder('f')
+        ->leftJoin('f.client', 'c')->addSelect('c')
+        ->leftJoin('f.status', 's')->addSelect('s')
+        ->leftJoin(AppAgence::class, 'agence', Join::WITH, 'agence.code = f.codeAgence')
+        ->leftJoin(CmlFactureEspace::class, 'factEspace', Join::WITH, 'factEspace.facture = f')
+        ->leftJoin(CptOperationCaisse::class, 'opCaisse', Join::WITH, 'f.reference = opCaisse.numFacturePiece')
+        ->leftJoin(CmlFactureEspace::class, 'espace', Join::WITH, 'espace.facture = f.id')
+        ->leftJoin(PatEspace::class, 'pat', Join::WITH, 'pat.id = espace.espace')
+        ->leftJoin(PatBienImmobilier::class, 'bien', Join::WITH, 'bien.id = pat.bienImmobilier')
+        ->leftJoin('bien.sci', 'patSci')->addSelect('patSci')
+        ->leftJoin('opCaisse.statusOperation', 'statusOperationCaisse')->addSelect('statusOperationCaisse')
+
+        ->select('SUBSTRING(f.dateFacture, 1, 10) as date')
+        ->addSelect('opCaisse.beneficiaire as beneficiaire')
+        ->addSelect('opCaisse.beneficiaire as contact')
+        ->addSelect('f.montantTotalNet as montant')
+        ->addSelect('opCaisse.numFacturePiece')
+        ->addSelect('agence.nom as nomAgence')
+        ->addSelect('patSci.libelle as sci')
+
+        // ->addSelect('SUM(opCaisse.montant) as montant_deja_paye')
+        // ->addSelect('f.montantTotalNet - SUM(opCaisse.montant) as montant_restant')
+        // ->addSelect('factEspace.nombreMois as nombre_mois_facture')
+
+        ->where("s.code IN ('SF001','SF002')")
+        ->andWhere('f.deleted = 0');
+
+        if($params['clientId']) {
+            $qb->andWhere('c.id = :client')->setParameter('client', $params['clientId']);
+        }
+
+        if($params['agenceCode']) {
+            $qb->andWhere('f.codeAgence = :agence')->setParameter('agence', $params['agenceCode']);
+        }
+
+        if($params['startDate']) {
+            $qb->andWhere('f.dateFacture > :startDate')->setParameter('startDate', $params['startDate']);
+        }
+
+        if($params['endDate']) {
+            $qb->andWhere('f.dateFacture < :endDate')->setParameter('endDate', $params['endDate']);
+        }
+
+        return $qb->groupBy('c.id')->getQuery()->getResult();
     }
 
     public function getFacturesByClient($clientId, $startDate, $endDate)
