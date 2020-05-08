@@ -36,33 +36,27 @@ class EtatController extends ApiController
     /**
      * ARRIERES DES CLIENTS: LISTE DES FACTURES AVEC LE MONTANT DEJA PAYE ET LE RESTE A PAYER.
      *
-     * @param string|null clientId:     L'id du client
-     * @param string|null agenceCode:   Le code de l'agence
+     * @param string|null clients:      Les identifiants des clients séparés par des virgules
+     * @param string|null agences:      Les identifiants des agences séparés par des virgules
+     * @param string|null scis:         Les identifiants des scis séparés par des virgules
      * @param string|null startDate:    Date de début
      * @param string|null endDate:      Date de fin
      *
-     * @Route("/arrierees")
+     * @Route("/arrieres")
      */
     public function getArrieresByClientIdByAgenceCodeByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
-        $query = $request->query;
-        $params = [
-            'clientId'  =>  $query->get('clientId'),
-            'agenceCode'  =>  $query->get('agenceCode'),
-            'startDate' =>  $query->get('startDate'),
-            'endDate'   =>  $query->get('endDate')
-        ];
-
         return $this->json(
-            $cmlFactureRepository->getEtatArrieresByClientIdByAgenceCodeByDate($params)
+            $cmlFactureRepository->getEtatArrieresByClientIdByAgenceCodeByDate($request->query)
         );
     }
 
     /**
      * ENCAISSEMENT DANS LES AGENCES SUR UNE PERIODE.
      *
-     * @param string|null clientId:     L'id du client
-     * @param string|null agenceCode:   Le code de l'agence
+     * @param string|null clients:      Les identifiants des clients séparés par des virgules
+     * @param string|null agences:      Les identifiants des agences séparés par des virgules
+     * @param string|null scis:         Les identifiants des scis séparés par des virgules
      * @param string|null startDate:    Date de début
      * @param string|null endDate:      Date de fin
      *
@@ -70,41 +64,26 @@ class EtatController extends ApiController
      */
     public function getEncaissementsByClientIdByAgenceCodeByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
-        $query = $request->query;
-        $params = [
-            'clientId'  =>  $query->get('clientId'),
-            'agenceCode'  =>  $query->get('agenceCode'),
-            'startDate' =>  $query->get('startDate'),
-            'endDate'   =>  $query->get('endDate')
-        ];
-
         return $this->json(
-            $cmlFactureRepository->getEtatEncaissementsByClientIdByAgenceCodeByDate($params)
+            $cmlFactureRepository->getEtatEncaissementsByClientIdByAgenceCodeByDate($request->query)
         );
     }
 
     /**
      * DECAISSEMENT DANS LES AGENCES SUR UNE PERIODE.
      *
-     * @param string|null clientId:     L'id du client
-     * @param string|null agenceCode:   Le code de l'agence
+     * @param string|null clients:      Les identifiants des clients séparés par des virgules
+     * @param string|null agences:      Les identifiants des agences séparés par des virgules
+     * @param string|null scis:         Les identifiants des scis séparés par des virgules
      * @param string|null startDate:    Date de début
      * @param string|null endDate:      Date de fin
      *
      * @Route("/decaissements")
      */
-    public function getDecaissementsByClientIdByAgenceCodeByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
+    public function getDecaissementsByClientsByAgencesByScisByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
-        $query = $request->query;
-        $params = [
-            'clientId'  =>  $query->get('clientId'),
-            'agenceCode'  =>  $query->get('agenceCode'),
-            'startDate' =>  $query->get('startDate'),
-            'endDate'   =>  $query->get('endDate')
-        ];
-
         return $this->json(
-            $cmlFactureRepository->getEtatDecaissementsByClientIdByAgenceCodeByDate($params)
+            $cmlFactureRepository->getDecaissementsByClientsByAgencesByScisByDate($request->query)
         );
     }
 }

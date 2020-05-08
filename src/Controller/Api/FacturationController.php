@@ -14,6 +14,7 @@ use App\Repository\CmlFactureRepository;
 use App\Repository\CptOperationCaisseRepository;
 use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 class FacturationController extends ApiController
 {
@@ -125,5 +126,31 @@ class FacturationController extends ApiController
         $this->denyAccessUnlessGranted('view', $this->getUser());
 
         return $this->jsonResponse($operation);
+    }
+
+
+    /**
+     * Facturation
+     *
+     * @param string|null clientId:     L'id du client
+     * @param string|null statusId:     L'id du status (payé, non payé, etc.)
+     * @param string|null startDate:    Date de début
+     * @param string|null endDate:      Date de fin
+     *
+     * @Route("/analyse/factures")
+     */
+    public function getFacturesByClientOrStatusOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
+    {
+        $query = $request->query;
+        $params = [
+            'clientId'  =>  $query->get('clientId'),
+            'statusId'  =>  $query->get('statusId'),
+            'startDate' =>  $query->get('startDate'),
+            'endDate'   =>  $query->get('endDate')
+        ];
+
+        return $this->json(
+            $cmlFactureRepository->getFacturesByClientOrStatusOrDate($params)
+        );
     }
 }
