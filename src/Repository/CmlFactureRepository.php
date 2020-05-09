@@ -45,7 +45,7 @@ class CmlFactureRepository extends ServiceEntityRepository
         if ($query) {
             $params = [
                 'clients' => $query->get('clients'),
-                'status' => $query->get('status'),
+                'status' => $query->get('facturesStatus'),
                 'startDate' => $query->get('startDate'),
                 'endDate' => $query->get('endDate'),
             ];
@@ -113,6 +113,30 @@ class CmlFactureRepository extends ServiceEntityRepository
 
         ->where("s.code IN ('SF001','SF002')");
 
+        return $this->bindEtatFilters($qb, $query);
+    }
+
+    public function getEtatEncaissementsByClientsOrAgencesOrScisOrDate(ParameterBag $query)
+    {
+        $qb = $this->getBaseFactureQueryBuilder()
+        ->select('f.reference')
+        ->addSelect('SUBSTRING(f.dateFacture, 1, 10) as dateDernierPaiement')
+        ->addSelect('c.nom as nomClient')
+        ->addSelect('c.personnePrincipalTel1 as contactClient')
+        ->addSelect('f.montantTotalNet as montant')
+        ->addSelect('opCaisse.numFacturePiece')
+        ->addSelect('agence.nom as nomAgence')
+        ->addSelect('patSci.libelle as sci')
+        ->addSelect('SUM(opCaisse.montant) as totalEncaissements')
+        ->addSelect('case when SUM(opCaisse.montant) IS NULL then 0 else SUM(opCaisse.montant) END as montantDernierPaiement')
+        ->addSelect('factEspace.loyerMensuel as loyer')
+        ->addSelect('factEspace.caution as caution')
+        ->addSelect('factEspace.nombreMois as nombreMois')
+        ->addSelect('pat.libelle as espaceLoue')
+
+        ->where("statusOperationCaisse.id = 1")
+        ->andWhere('typeOpCaisse.id = 8');
+        
         return $this->bindEtatFilters($qb, $query);
     }
 
