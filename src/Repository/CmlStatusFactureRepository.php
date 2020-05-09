@@ -24,32 +24,12 @@ class CmlStatusFactureRepository extends ServiceEntityRepository
         parent::__construct($registry, CmlStatusFacture::class);
     }
 
-    // /**
-    //  * @return CmlStatusFacture[] Returns an array of CmlStatusFacture objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getEnabledStatus()
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->createQueryBuilder('s')
+            ->select('s.code as id')
+            ->addSelect('s.libelle as name')
+            ->where('s.enabled = true')
+            ->getQuery()->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?CmlStatusFacture
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

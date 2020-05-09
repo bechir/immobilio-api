@@ -11,6 +11,7 @@ use App\Entity\CmlFacture;
 use App\Entity\CptOperationCaisse;
 use App\Repository\CmlFactureEspaceRepository;
 use App\Repository\CmlFactureRepository;
+use App\Repository\CmlStatusFactureRepository;
 use App\Repository\CptOperationCaisseRepository;
 use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -141,16 +142,54 @@ class FacturationController extends ApiController
      */
     public function getFacturesByClientOrStatusOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
-        $query = $request->query;
-        $params = [
-            'clientId'  =>  $query->get('clientId'),
-            'statusId'  =>  $query->get('statusId'),
-            'startDate' =>  $query->get('startDate'),
-            'endDate'   =>  $query->get('endDate')
-        ];
-
         return $this->json(
-            $cmlFactureRepository->getFacturesByClientOrStatusOrDate($params)
+            $cmlFactureRepository->getAnalyseEncFactDepByClientOrStatusOrDate(6, $request->query)
+        );
+    }
+
+    /**
+     * Encaissements
+     *
+     * @param string|null clientId:     L'id du client
+     * @param string|null statusId:     L'id du status (payé, non payé, etc.)
+     * @param string|null startDate:    Date de début
+     * @param string|null endDate:      Date de fin
+     *
+     * @Route("/analyse/encaissements")
+     */
+    public function getEncaissementsByClientOrStatusOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
+    {
+        return $this->json(
+            $cmlFactureRepository->getAnalyseEncFactDepByClientOrStatusOrDate(7, $request->query)
+        );
+    }
+
+    /**
+     * Dépenses
+     *
+     * @param string|null clientId:     L'id du client
+     * @param string|null statusId:     L'id du status (payé, non payé, etc.)
+     * @param string|null startDate:    Date de début
+     * @param string|null endDate:      Date de fin
+     *
+     * @Route("/analyse/depenses")
+     */
+    public function getDepensesByClientOrStatusOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
+    {
+        return $this->json(
+            $cmlFactureRepository->getAnalyseEncFactDepByClientOrStatusOrDate(8, $request->query)
+        );
+    }
+
+    /**
+     * Liste des status des factures
+     *
+     * @Route("/factures/status/enabled")
+     */
+    public function geFacturesStatus(CmlStatusFactureRepository $cmlStatusFactureRepository)
+    {
+        return $this->json(
+            $cmlStatusFactureRepository->getEnabledStatus()
         );
     }
 }

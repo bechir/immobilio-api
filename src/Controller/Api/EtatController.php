@@ -44,10 +44,10 @@ class EtatController extends ApiController
      *
      * @Route("/arrieres")
      */
-    public function getArrieresByClientIdByAgenceCodeByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
+    public function getArrieresByClientsOrAgencesOrScisOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
         return $this->json(
-            $cmlFactureRepository->getEtatArrieresByClientIdByAgenceCodeByDate($request->query)
+            $cmlFactureRepository->getEtatArrieresByClientsOrAgencesOrScisOrDate($request->query)
         );
     }
 
@@ -62,10 +62,10 @@ class EtatController extends ApiController
      *
      * @Route("/encaissements")
      */
-    public function getEncaissementsByClientIdByAgenceCodeByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
+    public function getEncaissementsByClientsOrAgencesOrScisOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
         return $this->json(
-            $cmlFactureRepository->getEtatEncaissementsByClientIdByAgenceCodeByDate($request->query)
+            $cmlFactureRepository->getEtatEncaissementsByClientsOrAgencesOrScisOrDate($request->query)
         );
     }
 
@@ -80,10 +80,10 @@ class EtatController extends ApiController
      *
      * @Route("/decaissements")
      */
-    public function getDecaissementsByClientsByAgencesByScisByDate(Request $request, CmlFactureRepository $cmlFactureRepository)
+    public function getDecaissementsByClientsOrAgencesOrScisOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
         return $this->json(
-            $cmlFactureRepository->getDecaissementsByClientsByAgencesByScisByDate($request->query)
+            $cmlFactureRepository->getEtatDecaissementsByClientsOrAgencesOrScisOrDate($request->query)
         );
     }
 }
