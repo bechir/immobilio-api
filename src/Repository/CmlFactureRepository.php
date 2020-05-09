@@ -54,23 +54,28 @@ class CmlFactureRepository extends ServiceEntityRepository
         $qb = $this->getBaseFactureQueryBuilder()
             ->leftJoin('f.contrat', 'contrat')->addSelect('contrat')
             ->leftJoin('opCaisse.createdBy', 'createdBy')->addSelect('createdBy')
+            ->leftJoin('pat.proprietaire', 'propr')->addSelect('propr')
 
             ->select('f.reference')
             ->addSelect('f.montantTotalNet as montant')
             ->addSelect('SUBSTRING(f.dateFacture, 1, 10) as emisLe')
-            ->addSelect('bien.libelle as bienImmo')
-            ->addSelect('pat.libelle as espaceLoue')
             ->addSelect('s.libelle as status')
             ->addSelect('agence.nom as nomAgence')
             ->addSelect('createdBy.username as creePar')
-            
+            ->addSelect('factEspace.loyerMensuel')
+
+            // Bien immobilier
+            ->addSelect('bien.libelle as bienImmo')
+            ->addSelect('pat.libelle as espaceLoue')
+            ->addSelect('propr.nom as proprietaire')
+
             // Contrat
             ->addSelect('contrat.numContrat')
             ->addSelect('SUBSTRING(contrat.dateSignature, 1, 10) as dateSignatureContrat')
-            ->addSelect('contrat.reference as referenceContrat')
             ->addSelect('contrat.reference as contratRef')
             ->addSelect('contrat.note as noteContrat')
             ->addSelect('contrat.montantTotal as montantContrat')
+            ->addSelect('opCaisse.numFacturePiece')
 
             // Client
             ->addSelect('c.nom as nomClient')
@@ -86,6 +91,14 @@ class CmlFactureRepository extends ServiceEntityRepository
     
             if(isset($params['status']) && !empty($params['status'])) {
                 $qb->andWhere($qb->expr()->in('s.code', explode(',', $params['status'])));
+            }
+
+            if(isset($params['startDate']) && !empty($params['startDate'])) {
+                $qb->andWhere('f.dateFacture > :startDate')->setParameter('startDate', $params['startDate']);
+            }
+    
+            if(isset($params['endDate']) && !empty($params['endDate'])) {
+                $qb->andWhere('f.dateFacture < :endDate')->setParameter('endDate', $params['endDate']);
             }    
 
             return $qb->getQuery()->getResult();
@@ -104,11 +117,12 @@ class CmlFactureRepository extends ServiceEntityRepository
         ->addSelect('agence.nom as nomAgence')
         ->addSelect('patSci.libelle as sci')
         ->addSelect('f.montantTotalNet - case when SUM(opCaisse.montant) IS NULL then 0 else SUM(opCaisse.montant) END as montantDu')
-        ->addSelect('case when SUM(opCaisse.montant) IS NULL then \'-\' else SUM(opCaisse.montant) END as montantDernierPaiement')
-        ->addSelect('factEspace.loyerMensuel as loyer')
+        ->addSelect('case when SUM(opCaisse.montant) IS NULL then 0 else SUM(opCaisse.montant) END as montantDernierPaiement')
+        ->addSelect('factEspace.loyerMensuel')
         ->addSelect('factEspace.caution as caution')
         ->addSelect('factEspace.nombreMois as nombreMois')
         ->addSelect('pat.libelle as espaceLoue')
+        ->addSelect('bien.libelle as bienImmo')
         ->addSelect('propr.nom as proprietaire')
 
         ->where("s.code IN ('SF001','SF002')");
@@ -129,10 +143,11 @@ class CmlFactureRepository extends ServiceEntityRepository
         ->addSelect('patSci.libelle as sci')
         ->addSelect('SUM(opCaisse.montant) as totalEncaissements')
         ->addSelect('case when SUM(opCaisse.montant) IS NULL then 0 else SUM(opCaisse.montant) END as montantDernierPaiement')
-        ->addSelect('factEspace.loyerMensuel as loyer')
+        ->addSelect('factEspace.loyerMensuel')
         ->addSelect('factEspace.caution as caution')
         ->addSelect('factEspace.nombreMois as nombreMois')
         ->addSelect('pat.libelle as espaceLoue')
+        ->addSelect('bien.libelle as bienImmo')
 
         ->where("statusOperationCaisse.id = 1")
         ->andWhere('typeOpCaisse.id = 8');
