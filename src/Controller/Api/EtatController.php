@@ -8,6 +8,7 @@
 namespace App\Controller\Api;
 
 use App\Repository\CmlFactureRepository;
+use App\Repository\CptOperationCaisseRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,6 +85,33 @@ class EtatController extends ApiController
     {
         return $this->json(
             $cmlFactureRepository->getEtatDecaissementsByClientsOrAgencesOrScisOrDate($request->query)
+        );
+    }
+
+    /**
+     * SITUATIONS DES CAISSES SUR UNE PERIODE.
+     *
+     * @param string|null clients:      Les identifiants des clients séparés par des virgules
+     * @param string|null agences:      Les identifiants des agences séparés par des virgules
+     * @param string|null scis:         Les identifiants des scis séparés par des virgules
+     * @param string|null startDate:    Date de début
+     * @param string|null endDate:      Date de fin
+     *
+     * @Route("/situations-caisses")
+     */
+    public function getSituationsCaissesByClientsOrAgencesOrScisOrDate(Request $request, CptOperationCaisseRepository $cptOperationCaisseRepository)
+    {
+        $query = $request->query;
+        $params = [
+            'clients'   => $query->get('clients'),
+            'agences'   => $query->get('agences'),
+            'scis'      => $query->get('scis'),
+            'startDate' => $query->get('startDate'),
+            'endDate'   => $query->get('endDate')
+        ];
+
+        return $this->json(
+            $cptOperationCaisseRepository->getEtatSituationCaissesByClientsOrAgencesOrScisOrDate($params)
         );
     }
 }

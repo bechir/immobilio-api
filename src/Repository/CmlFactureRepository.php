@@ -39,7 +39,7 @@ class CmlFactureRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
-    public function getAnalyseEncFactDepByClientOrStatusOrDate(string $typeId, ParameterBag $query = null)
+    public function getAnalyseEncFactByClientOrStatusOrDate(string $typeId, ParameterBag $query = null)
     {
         $params = [];
         if ($query) {
@@ -76,6 +76,7 @@ class CmlFactureRepository extends ServiceEntityRepository
             ->addSelect('contrat.note as noteContrat')
             ->addSelect('contrat.montantTotal as montantContrat')
             ->addSelect('opCaisse.numFacturePiece')
+            ->addSelect('opCaisse.libelle')
 
             // Client
             ->addSelect('c.nom as nomClient')

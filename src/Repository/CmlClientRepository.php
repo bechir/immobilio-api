@@ -29,6 +29,32 @@ class CmlClientRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
+    public function getAnalyseClientsByClientsOrDate($params = [])
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->select('c.raisonSociale')
+            ->addSelect('c.adresse as localisation')
+            ->addSelect('c.personnePrincipalNom as interlocuteur')
+            ->addSelect('c.telClient as tel')
+            ->addSelect('c.emailClient as email')
+            // ->addSelect('c.affecteA')
+            ->where('c.deleted = 0');
+
+            if(isset($params['clients']) && !empty($params['clients'])) {
+                $qb->andWhere($qb->expr()->in('c.id', explode(',', $params['clients'])));
+            }
+
+            if(isset($params['startDate']) && !empty($params['startDate'])) {
+                $qb->andWhere('c.createdA > :startDate')->setParameter('startDate', $params['startDate']);
+            }
+    
+            if(isset($params['endDate']) && !empty($params['endDate'])) {
+                $qb->andWhere('c.createdA < :endDate')->setParameter('endDate', $params['endDate']);
+            }    
+
+            return $qb->getQuery()->getResult();
+    }
+
     public function buildPeriodQuery(string $start = null, string $end = null)
     {
         if (!$start) {

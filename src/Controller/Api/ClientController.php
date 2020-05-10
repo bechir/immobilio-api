@@ -9,9 +9,9 @@ namespace App\Controller\Api;
 
 use App\Entity\CmlClient;
 use App\Repository\CmlClientRepository;
-use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/clients")
@@ -20,6 +20,31 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  */
 class ClientController extends ApiController
 {
+    /**
+     * Clients
+     *
+     * @param string|null clientId:     L'id du client
+     * @param string|null statusId:     L'id du status (payé, non payé, etc.)
+     * @param string|null startDate:    Date de début
+     * @param string|null endDate:      Date de fin
+     *
+     * @Route("/analyse")
+     */
+    public function getAnalyseClientsByClientsOrDate(Request $request, CmlClientRepository $cmlClientRepository)
+    {
+        $query = $request->query;
+        $params = [
+            'clients' => $query->get('clients'),
+            'status' => $query->get('facturesStatus'),
+            'startDate' => $query->get('startDate'),
+            'endDate' => $query->get('endDate'),
+        ];
+
+        return $this->json(
+            $cmlClientRepository->getAnalyseClientsByClientsOrDate($params)
+        );
+    }
+
     /**
      * Liste des clients enregistrées sur une période (date de début et de fin)
      * Retourne les résultats des 12 derniers mois si les dates sont nulles.

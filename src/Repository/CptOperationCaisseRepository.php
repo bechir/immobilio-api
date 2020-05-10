@@ -224,6 +224,71 @@ class CptOperationCaisseRepository extends ServiceEntityRepository
         );
     }
 
+    public function getEtatSituationCaissesByClientsOrAgencesOrScisOrDate($params)
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.statusOperation', 'status')->addSelect('status')
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->leftJoin('o.nature', 'n')->addSelect('n')
+            
+            ->select('o.reference')
+            ->addSelect('t.label as caisse')
+            ->addSelect('o.libelle')
+            ->addSelect('n.label as nature')
+            ->addSelect('o.soldeApresOperation as solde')
+            ->addSelect('SUBSTRING(o.dateOperation, 1, 10) as date');
+
+        if(isset($params['agences']) && !empty($params['agences'])) {
+            $qb->andWhere($qb->expr()->in('agence.id', explode(',', $params['agences'])));
+        }
+
+        if(isset($params['startDate']) && !empty($params['startDate'])) {
+            $qb->andWhere('o.dateOperation > :startDate')->setParameter('startDate', $params['startDate']);
+        }
+
+        if(isset($params['endDate']) && !empty($params['endDate'])) {
+            $qb->andWhere('o.dateOperation < :endDate')->setParameter('endDate', $params['endDate']);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function getAnalyseDepensesByClientOrStatusOrDate($params)
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.statusOperation', 'status')->addSelect('status')
+            ->leftJoin('o.typeOperationCaisse', 't')->addSelect('t')
+            ->leftJoin('o.nature', 'n')->addSelect('n')
+            ->leftJoin('o.createdBy', 'createdBy')->addSelect('createdBy')
+            ->leftJoin(AppAgence::class, 'a', Join::WITH, 'a.code = o.codeAgence')
+            
+            ->select('o.reference')
+            ->addSelect('t.label as typeOp')
+            ->addSelect('o.libelle')
+            ->addSelect('o.montant')
+            ->addSelect('SUBSTRING(o.dateOperation, 1, 10) as date')
+            ->addSelect('a.nom as agence')
+            ->addSelect('createdBy.username as creePar')
+            
+            ->where('status.id = 1')
+            ->andWhere('o.deleted = 0')
+            ->andWhere('t.id = 8');
+
+        if(isset($params['agences']) && !empty($params['agences'])) {
+            $qb->andWhere($qb->expr()->in('agence.id', explode(',', $params['agences'])));
+        }
+
+        if(isset($params['startDate']) && !empty($params['startDate'])) {
+            $qb->andWhere('o.dateOperation > :startDate')->setParameter('startDate', $params['startDate']);
+        }
+
+        if(isset($params['endDate']) && !empty($params['endDate'])) {
+            $qb->andWhere('o.dateOperation < :endDate')->setParameter('endDate', $params['endDate']);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function getPaiementsFactureByDatesAgenceSci($agenceId, $sciId, $startDate = null, $endDate = null)
     {
         return $this->createQueryBuilder('o')

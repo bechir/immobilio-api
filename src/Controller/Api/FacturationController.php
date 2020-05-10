@@ -143,7 +143,7 @@ class FacturationController extends ApiController
     public function getFacturesByClientOrStatusOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
         return $this->json(
-            $cmlFactureRepository->getAnalyseEncFactDepByClientOrStatusOrDate(6, $request->query)
+            $cmlFactureRepository->getAnalyseEncFactByClientOrStatusOrDate(6, $request->query)
         );
     }
 
@@ -160,24 +160,7 @@ class FacturationController extends ApiController
     public function getEncaissementsByClientOrStatusOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
     {
         return $this->json(
-            $cmlFactureRepository->getAnalyseEncFactDepByClientOrStatusOrDate(7, $request->query)
-        );
-    }
-
-    /**
-     * Dépenses
-     *
-     * @param string|null clientId:     L'id du client
-     * @param string|null statusId:     L'id du status (payé, non payé, etc.)
-     * @param string|null startDate:    Date de début
-     * @param string|null endDate:      Date de fin
-     *
-     * @Route("/analyse/depenses")
-     */
-    public function getDepensesByClientOrStatusOrDate(Request $request, CmlFactureRepository $cmlFactureRepository)
-    {
-        return $this->json(
-            $cmlFactureRepository->getAnalyseEncFactDepByClientOrStatusOrDate(8, $request->query)
+            $cmlFactureRepository->getAnalyseEncFactByClientOrStatusOrDate(7, $request->query)
         );
     }
 
