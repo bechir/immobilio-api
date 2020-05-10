@@ -24,32 +24,21 @@ class CmlContratRepository extends ServiceEntityRepository
         parent::__construct($registry, CmlContrat::class);
     }
 
-    // /**
-    //  * @return CmlContrat[] Returns an array of CmlContrat objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getAnalyseContratsByClientsOrDate($params)
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+            ->leftJoin('c.client', 'cl')->addSelect('cl')
+            ->select('c.numContrat')
+            ->addSelect('SUBSTRING(c.dateSignature, 1, 10) as dateSign')
+            ->addSelect('SUBSTRING(c.createdAt, 1, 10) as dateEnreg')
+            ->addSelect('c.montantTotal as montant')
+            ->addSelect('c.reference')
+            ->addSelect('c.contenu')
+            ->addSelect('cl.nom as nomClient')
+            ->addSelect('cl.prenom as prenomClient')
+            ->addSelect('c.cycleFacturation as nbEspaces')
 
-    /*
-    public function findOneBySomeField($value): ?CmlContrat
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->where('c.deleted = 0')
+            ->getQuery()->getResult();
     }
-    */
 }

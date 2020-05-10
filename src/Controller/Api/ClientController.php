@@ -9,6 +9,7 @@ namespace App\Controller\Api;
 
 use App\Entity\CmlClient;
 use App\Repository\CmlClientRepository;
+use App\Repository\CmlContratRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,23 @@ use Symfony\Component\HttpFoundation\Request;
 class ClientController extends ApiController
 {
     /**
+     * Contrats
+     *
+     * @param string|null clientId:     L'id du client
+     * @param string|null statusId:     L'id du status (payé, non payé, etc.)
+     * @param string|null startDate:    Date de début
+     * @param string|null endDate:      Date de fin
+     *
+     * @Route("/contrats")
+     */
+    public function getAnalyseContratsByClientsOrDate(Request $request, CmlContratRepository $cmlContratRepository)
+    {
+        return $this->json(
+            $cmlContratRepository->getAnalyseContratsByClientsOrDate($this->getParams($request))
+        );
+    }
+
+    /**
      * Clients
      *
      * @param string|null clientId:     L'id du client
@@ -32,17 +50,20 @@ class ClientController extends ApiController
      */
     public function getAnalyseClientsByClientsOrDate(Request $request, CmlClientRepository $cmlClientRepository)
     {
+        return $this->json(
+            $cmlClientRepository->getAnalyseClientsByClientsOrDate($this->getParams($request))
+        );
+    }
+
+    public function getParams(Request $request)
+    {
         $query = $request->query;
-        $params = [
+        return [
             'clients' => $query->get('clients'),
             'status' => $query->get('facturesStatus'),
             'startDate' => $query->get('startDate'),
             'endDate' => $query->get('endDate'),
         ];
-
-        return $this->json(
-            $cmlClientRepository->getAnalyseClientsByClientsOrDate($params)
-        );
     }
 
     /**
