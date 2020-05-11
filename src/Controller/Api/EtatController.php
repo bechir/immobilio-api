@@ -104,7 +104,7 @@ class EtatController extends ApiController
         $query = $request->query;
         $params = [
             'clients'   => $query->get('clients'),
-            'agences'   => $query->get('agences'),
+            // 'agences'   => $query->get('agences'),
             'scis'      => $query->get('scis'),
             'startDate' => $query->get('startDate'),
             'endDate'   => $query->get('endDate')

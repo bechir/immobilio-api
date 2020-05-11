@@ -24,32 +24,37 @@ class PatProprietaireRepository extends ServiceEntityRepository
         parent::__construct($registry, PatProprietaire::class);
     }
 
-    // /**
-    //  * @return PatProprietaire[] Returns an array of PatProprietaire objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getPatrimoineProprietairesByClientsOrAgencesOrScisOrDate($params = [])
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.createdBy', 'createdBy')->addSelect('createdBy')
 
-    /*
-    public function findOneBySomeField($value): ?PatProprietaire
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->select('p.reference')
+            ->addSelect('p.nom')
+            ->addSelect('p.prenoms')
+            ->addSelect('p.email')
+            ->addSelect('p.telephone1 as tel')
+            ->addSelect('createdBy.username as creePar')
+            ->addSelect('SUBSTRING(p.createdAt, 1, 10) as creeLe')
+
+            ->where('p.deleted = 0');
+
+        // if(isset($params['agences']) && !empty($params['agences'])) {
+        //     $qb->andWhere($qb->expr()->in('agence.id', explode(',', $params['agences'])));
+        // }
+
+        // if(isset($params['scis']) && !empty($params['scis'])) {
+        //     $qb->andWhere($qb->expr()->in('patSci.id', explode(',', $params['scis'])));
+        // }
+
+        if(isset($params['startDate']) && !empty($params['startDate'])) {
+            $qb->andWhere('p.createdAt > :startDate')->setParameter('startDate', $params['startDate']);
+        }
+
+        if(isset($params['endDate']) && !empty($params['endDate'])) {
+            $qb->andWhere('p.createdAt < :endDate')->setParameter('endDate', $params['endDate']);
+        }    
+
+        return $qb->getQuery()->getResult();
     }
-    */
 }
