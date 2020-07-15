@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Controller\Api;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 class ClientController extends ApiController
 {
     /**
-     * Contrats
+     * Contrats.
      *
      * @param string|null clientId:     L'id du client
      * @param string|null statusId:     L'id du status (payé, non payé, etc.)
@@ -39,7 +39,7 @@ class ClientController extends ApiController
     }
 
     /**
-     * Clients
+     * Clients.
      *
      * @param string|null clientId:     L'id du client
      * @param string|null statusId:     L'id du status (payé, non payé, etc.)
@@ -58,6 +58,7 @@ class ClientController extends ApiController
     public function getParams(Request $request)
     {
         $query = $request->query;
+
         return [
             'clients' => $query->get('clients'),
             'status' => $query->get('facturesStatus'),

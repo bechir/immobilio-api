@@ -2,12 +2,11 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Controller\Api;
 
-use App\Repository\CmlContratRepository;
 use App\Repository\PatBienImmobilierRepository;
 use App\Repository\PatProprietaireRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -22,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 class PatrimoineController extends ApiController
 {
     /**
-     * Biens immobiliers
+     * Biens immobiliers.
      *
      * @param string|null clientId:     L'id du client
      * @param string|null startDate:    Date de début
@@ -38,7 +37,7 @@ class PatrimoineController extends ApiController
     }
 
     /**
-     * Proprietaire
+     * Proprietaire.
      *
      * @param string|null clientId:     L'id du client
      * @param string|null startDate:    Date de début
@@ -56,6 +55,7 @@ class PatrimoineController extends ApiController
     public function getParams(Request $request)
     {
         $query = $request->query;
+
         return [
             'clients' => $query->get('clients'),
             'startDate' => $query->get('startDate'),

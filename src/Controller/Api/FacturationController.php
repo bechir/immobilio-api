@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Controller\Api;
@@ -129,9 +129,8 @@ class FacturationController extends ApiController
         return $this->jsonResponse($operation);
     }
 
-
     /**
-     * Facturation
+     * Facturation.
      *
      * @param string|null clientId:     L'id du client
      * @param string|null statusId:     L'id du status (payé, non payé, etc.)
@@ -148,7 +147,7 @@ class FacturationController extends ApiController
     }
 
     /**
-     * Encaissements
+     * Encaissements.
      *
      * @param string|null clientId:     L'id du client
      * @param string|null statusId:     L'id du status (payé, non payé, etc.)
@@ -165,7 +164,7 @@ class FacturationController extends ApiController
     }
 
     /**
-     * Liste des status des factures
+     * Liste des status des factures.
      *
      * @Route("/factures/status/enabled")
      */

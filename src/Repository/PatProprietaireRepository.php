@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Repository;
@@ -47,13 +47,13 @@ class PatProprietaireRepository extends ServiceEntityRepository
         //     $qb->andWhere($qb->expr()->in('patSci.id', explode(',', $params['scis'])));
         // }
 
-        if(isset($params['startDate']) && !empty($params['startDate'])) {
+        if (isset($params['startDate']) && !empty($params['startDate'])) {
             $qb->andWhere('p.createdAt > :startDate')->setParameter('startDate', $params['startDate']);
         }
 
-        if(isset($params['endDate']) && !empty($params['endDate'])) {
+        if (isset($params['endDate']) && !empty($params['endDate'])) {
             $qb->andWhere('p.createdAt < :endDate')->setParameter('endDate', $params['endDate']);
-        }    
+        }
 
         return $qb->getQuery()->getResult();
     }

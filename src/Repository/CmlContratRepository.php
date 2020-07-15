@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Repository;
@@ -39,11 +39,11 @@ class CmlContratRepository extends ServiceEntityRepository
             ->addSelect('c.cycleFacturation as nbEspaces')
             ->where('c.deleted = 0');
 
-        if(isset($params['startDate']) && !empty($params['startDate'])) {
+        if (isset($params['startDate']) && !empty($params['startDate'])) {
             $qb->andWhere('c.dateSignature > :startDate')->setParameter('startDate', $params['startDate']);
         }
 
-        if(isset($params['endDate']) && !empty($params['endDate'])) {
+        if (isset($params['endDate']) && !empty($params['endDate'])) {
             $qb->andWhere('c.dateSignature < :endDate')->setParameter('endDate', $params['endDate']);
         }
 

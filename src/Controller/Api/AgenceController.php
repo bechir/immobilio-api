@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Controller\Api;
@@ -47,9 +47,9 @@ class AgenceController extends ApiController
     {
         return $this->jsonResponse($agence, 'json', SerializationContext::create()->setGroups(['details']));
     }
-    
+
     /**
-     * Liste des scis
+     * Liste des scis.
      *
      * @Route("scis/list")
      */

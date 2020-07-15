@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Repository;
@@ -86,23 +86,23 @@ class CmlFactureRepository extends ServiceEntityRepository
 
             ->where('typeOpCaisse.id = :typeId')->setParameter('typeId', $typeId);
 
-            if(isset($params['clients']) && !empty($params['clients'])) {
-                $qb->andWhere($qb->expr()->in('c.id', explode(',', $params['clients'])));
-            }
-    
-            if(isset($params['status']) && !empty($params['status'])) {
-                $qb->andWhere($qb->expr()->in('s.code', explode(',', $params['status'])));
-            }
+        if (isset($params['clients']) && !empty($params['clients'])) {
+            $qb->andWhere($qb->expr()->in('c.id', explode(',', $params['clients'])));
+        }
 
-            if(isset($params['startDate']) && !empty($params['startDate'])) {
-                $qb->andWhere('f.dateFacture > :startDate')->setParameter('startDate', $params['startDate']);
-            }
-    
-            if(isset($params['endDate']) && !empty($params['endDate'])) {
-                $qb->andWhere('f.dateFacture < :endDate')->setParameter('endDate', $params['endDate']);
-            }    
+        if (isset($params['status']) && !empty($params['status'])) {
+            $qb->andWhere($qb->expr()->in('s.code', explode(',', $params['status'])));
+        }
 
-            return $qb->getQuery()->getResult();
+        if (isset($params['startDate']) && !empty($params['startDate'])) {
+            $qb->andWhere('f.dateFacture > :startDate')->setParameter('startDate', $params['startDate']);
+        }
+
+        if (isset($params['endDate']) && !empty($params['endDate'])) {
+            $qb->andWhere('f.dateFacture < :endDate')->setParameter('endDate', $params['endDate']);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function getEtatArrieresByClientsOrAgencesOrScisOrDate(ParameterBag $query)
@@ -150,9 +150,9 @@ class CmlFactureRepository extends ServiceEntityRepository
         ->addSelect('pat.libelle as espaceLoue')
         ->addSelect('bien.libelle as bienImmo')
 
-        ->where("statusOperationCaisse.id = 1")
+        ->where('statusOperationCaisse.id = 1')
         ->andWhere('typeOpCaisse.id = 8');
-        
+
         return $this->bindEtatFilters($qb, $query);
     }
 
@@ -172,7 +172,7 @@ class CmlFactureRepository extends ServiceEntityRepository
         ->addSelect('moyPaiement.libelle as moyenPaiement')
         ->addSelect('opCaisse.banqueCompteBancaire as compteBancaire')
 
-        ->where("statusOperationCaisse.id = 1")
+        ->where('statusOperationCaisse.id = 1')
         ->andWhere('typeOpCaisse.id = 8')
         ->andWhere('f.deleted = 0');
 
@@ -182,34 +182,34 @@ class CmlFactureRepository extends ServiceEntityRepository
     public function bindEtatFilters(QueryBuilder $qb, ParameterBag $query)
     {
         $params = [
-            'clients'   => $query->get('clients'),
-            'agences'   => $query->get('agences'),
-            'scis'      => $query->get('scis'),
+            'clients' => $query->get('clients'),
+            'agences' => $query->get('agences'),
+            'scis' => $query->get('scis'),
             'startDate' => $query->get('startDate'),
-            'endDate'   => $query->get('endDate')
+            'endDate' => $query->get('endDate'),
         ];
 
-        if(isset($params['clients']) && !empty($params['clients'])) {
+        if (isset($params['clients']) && !empty($params['clients'])) {
             $qb->andWhere($qb->expr()->in('c.id', explode(',', $params['clients'])));
         }
 
-        if(isset($params['agences']) && !empty($params['agences'])) {
+        if (isset($params['agences']) && !empty($params['agences'])) {
             $qb->andWhere($qb->expr()->in('agence.id', explode(',', $params['agences'])));
         }
 
-        if(isset($params['scis']) && !empty($params['scis'])) {
+        if (isset($params['scis']) && !empty($params['scis'])) {
             $qb->andWhere($qb->expr()->in('patSci.id', explode(',', $params['scis'])));
         }
 
-        if(isset($params['statusId']) && !empty($params['statusId'])) {
+        if (isset($params['statusId']) && !empty($params['statusId'])) {
             $qb->andWhere('statusOperationCaisse.id = :statusId')->setParameter('statusId', $params['statusId']);
         }
 
-        if(isset($params['startDate']) && !empty($params['startDate'])) {
+        if (isset($params['startDate']) && !empty($params['startDate'])) {
             $qb->andWhere('f.dateFacture > :startDate')->setParameter('startDate', $params['startDate']);
         }
 
-        if(isset($params['endDate']) && !empty($params['endDate'])) {
+        if (isset($params['endDate']) && !empty($params['endDate'])) {
             $qb->andWhere('f.dateFacture < :endDate')->setParameter('endDate', $params['endDate']);
         }
 

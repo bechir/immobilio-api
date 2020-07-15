@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Repository;
@@ -23,6 +23,7 @@ class CmlClientRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CmlClient::class);
     }
+
     public function getClients(string $startDate = null, string $endDate = null)
     {
         return $this->buildPeriodQuery($startDate, $endDate)
@@ -40,19 +41,19 @@ class CmlClientRepository extends ServiceEntityRepository
             // ->addSelect('c.affecteA')
             ->where('c.deleted = 0');
 
-            if(isset($params['clients']) && !empty($params['clients'])) {
-                $qb->andWhere($qb->expr()->in('c.id', explode(',', $params['clients'])));
-            }
+        if (isset($params['clients']) && !empty($params['clients'])) {
+            $qb->andWhere($qb->expr()->in('c.id', explode(',', $params['clients'])));
+        }
 
-            if(isset($params['startDate']) && !empty($params['startDate'])) {
-                $qb->andWhere('c.createdA > :startDate')->setParameter('startDate', $params['startDate']);
-            }
-    
-            if(isset($params['endDate']) && !empty($params['endDate'])) {
-                $qb->andWhere('c.createdA < :endDate')->setParameter('endDate', $params['endDate']);
-            }    
+        if (isset($params['startDate']) && !empty($params['startDate'])) {
+            $qb->andWhere('c.createdA > :startDate')->setParameter('startDate', $params['startDate']);
+        }
 
-            return $qb->getQuery()->getResult();
+        if (isset($params['endDate']) && !empty($params['endDate'])) {
+            $qb->andWhere('c.createdA < :endDate')->setParameter('endDate', $params['endDate']);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function buildPeriodQuery(string $start = null, string $end = null)

@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Immobilio API.
- * (c) KuTiWa, Inc.
+ * (c) Bechir Ba <bechiirr71@gmail.com>
  */
 
 namespace App\Controller\Api;
@@ -103,11 +103,11 @@ class EtatController extends ApiController
     {
         $query = $request->query;
         $params = [
-            'clients'   => $query->get('clients'),
+            'clients' => $query->get('clients'),
             // 'agences'   => $query->get('agences'),
-            'scis'      => $query->get('scis'),
+            'scis' => $query->get('scis'),
             'startDate' => $query->get('startDate'),
-            'endDate'   => $query->get('endDate')
+            'endDate' => $query->get('endDate'),
         ];
 
         return $this->json(
